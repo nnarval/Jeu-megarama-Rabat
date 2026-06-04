@@ -365,9 +365,20 @@ export default function AdminPage() {
   };
 
   const toggleRealScorer = (name: string) => {
-    setRealScorers((prev) =>
-      prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]
-    );
+    setRealScorers((prev) => {
+      const count = prev.filter((s) => s === name).length;
+      const without = prev.filter((s) => s !== name);
+      const next = count >= 3 ? 0 : count + 1;
+      return [...without, ...Array(next).fill(name)];
+    });
+  };
+
+  const removeOneRealScorer = (name: string) => {
+    setRealScorers((prev) => {
+      const idx = prev.lastIndexOf(name);
+      if (idx === -1) return prev;
+      return [...prev.slice(0, idx), ...prev.slice(idx + 1)];
+    });
   };
 
   const filteredBets = search
@@ -803,23 +814,26 @@ export default function AdminPage() {
             <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-6 mb-6">
               <h3 className="text-base font-bold text-white mb-2">Buteurs réels</h3>
               <p className="text-xs text-gray-500 mb-5">
-                {realScorers.length} joueur{realScorers.length > 1 ? 's' : ''} sélectionné{realScorers.length > 1 ? 's' : ''}
+                {realScorers.length} but{realScorers.length > 1 ? 's' : ''} — cliquez sur un joueur pour ajouter un but (jusqu'à 3), recliquez pour remettre à 0
               </p>
 
               {realScorers.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-5">
-                  {realScorers.map((s) => (
-                    <span
-                      key={s}
-                      className="flex items-center gap-1.5 text-xs bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg px-2.5 py-1.5 font-medium"
-                    >
-                      {s}
-                      <button
-                        onClick={() => toggleRealScorer(s)}
-                        className="text-green-600 hover:text-red-400 transition-colors"
-                      >×</button>
-                    </span>
-                  ))}
+                  {Array.from(new Set(realScorers)).map((s) => {
+                    const count = realScorers.filter((r) => r === s).length;
+                    return (
+                      <span
+                        key={s}
+                        className="flex items-center gap-1.5 text-xs bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg px-2.5 py-1.5 font-medium"
+                      >
+                        {s}{count > 1 && <strong className="text-green-300"> ×{count}</strong>}
+                        <button
+                          onClick={() => removeOneRealScorer(s)}
+                          className="text-green-600 hover:text-red-400 transition-colors ml-0.5"
+                        >×</button>
+                      </span>
+                    );
+                  })}
                 </div>
               )}
 
@@ -829,21 +843,28 @@ export default function AdminPage() {
                   {selectedMatch.team1.flag} {selectedMatch.team1.name}
                 </p>
                 <div className="grid grid-cols-2 gap-1.5">
-                  {team1Squad.filter(p => p.position !== 'GK').map((player) => (
-                    <button
-                      key={player.name}
-                      type="button"
-                      onClick={() => toggleRealScorer(player.name)}
-                      className={`text-left text-xs px-3 py-2 rounded-lg transition-all border ${
-                        realScorers.includes(player.name)
-                          ? 'bg-green-500/15 border-green-500/40 text-green-400 font-semibold'
-                          : 'bg-[#1a1a1a] border-[#2a2a2a] text-gray-400 hover:border-[#3a3a3a]'
-                      }`}
-                    >
-                      {player.name}
-                      {!player.starter && <span className="text-gray-600 ml-1">(R)</span>}
-                    </button>
-                  ))}
+                  {team1Squad.filter(p => p.position !== 'GK').map((player) => {
+                    const count = realScorers.filter((s) => s === player.name).length;
+                    return (
+                      <button
+                        key={player.name}
+                        type="button"
+                        onClick={() => toggleRealScorer(player.name)}
+                        className={`text-left text-xs px-3 py-2 rounded-lg transition-all border flex items-center justify-between ${
+                          count > 0
+                            ? 'bg-green-500/15 border-green-500/40 text-green-400 font-semibold'
+                            : 'bg-[#1a1a1a] border-[#2a2a2a] text-gray-400 hover:border-[#3a3a3a]'
+                        }`}
+                      >
+                        <span>{player.name}{!player.starter && <span className="text-gray-600 ml-1">(R)</span>}</span>
+                        {count > 0 && (
+                          <span className="ml-2 w-5 h-5 rounded-full bg-green-500 text-white text-[10px] font-black flex items-center justify-center flex-shrink-0">
+                            {count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -853,21 +874,28 @@ export default function AdminPage() {
                   {selectedMatch.team2.flag} {selectedMatch.team2.name}
                 </p>
                 <div className="grid grid-cols-2 gap-1.5">
-                  {team2Squad.filter(p => p.position !== 'GK').map((player) => (
-                    <button
-                      key={player.name}
-                      type="button"
-                      onClick={() => toggleRealScorer(player.name)}
-                      className={`text-left text-xs px-3 py-2 rounded-lg transition-all border ${
-                        realScorers.includes(player.name)
-                          ? 'bg-green-500/15 border-green-500/40 text-green-400 font-semibold'
-                          : 'bg-[#1a1a1a] border-[#2a2a2a] text-gray-400 hover:border-[#3a3a3a]'
-                      }`}
-                    >
-                      {player.name}
-                      {!player.starter && <span className="text-gray-600 ml-1">(R)</span>}
-                    </button>
-                  ))}
+                  {team2Squad.filter(p => p.position !== 'GK').map((player) => {
+                    const count = realScorers.filter((s) => s === player.name).length;
+                    return (
+                      <button
+                        key={player.name}
+                        type="button"
+                        onClick={() => toggleRealScorer(player.name)}
+                        className={`text-left text-xs px-3 py-2 rounded-lg transition-all border flex items-center justify-between ${
+                          count > 0
+                            ? 'bg-green-500/15 border-green-500/40 text-green-400 font-semibold'
+                            : 'bg-[#1a1a1a] border-[#2a2a2a] text-gray-400 hover:border-[#3a3a3a]'
+                        }`}
+                      >
+                        <span>{player.name}{!player.starter && <span className="text-gray-600 ml-1">(R)</span>}</span>
+                        {count > 0 && (
+                          <span className="ml-2 w-5 h-5 rounded-full bg-green-500 text-white text-[10px] font-black flex items-center justify-center flex-shrink-0">
+                            {count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>

@@ -398,8 +398,8 @@ export default function MatchBettingPage() {
         {!bettingOpen && !submitted && (
           <div className="animate-slide-up bg-[#111] border border-[#2a2a2a] rounded-2xl p-8 text-center">
             <div className="text-5xl mb-4">🔒</div>
-            <h2 className="text-xl font-bold text-white mb-2">Paris fermés</h2>
-            <p className="text-gray-500 text-sm">Les paris sont actuellement fermés.<br />Revenez avant le coup d'envoi !</p>
+            <h2 className="text-xl font-bold text-white mb-2">Jeu fermé</h2>
+            <p className="text-gray-500 text-sm">Le jeu est actuellement fermé.<br />Revenez avant le coup d'envoi !</p>
           </div>
         )}
 
@@ -414,7 +414,7 @@ export default function MatchBettingPage() {
                 >
                   <CheckIcon className="w-8 h-8 text-[#FFD700]" />
                 </div>
-                <h2 className="text-xl font-black text-white">Pari enregistré !</h2>
+                <h2 className="text-xl font-black text-white">Sélection enregistrée !</h2>
                 <p className="text-gray-400 text-sm mt-1">Bonne chance @{submittedBet.instagram} 🎉</p>
               </div>
 

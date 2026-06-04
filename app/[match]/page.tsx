@@ -28,7 +28,7 @@ function PlayerSilhouette({ selected }: { selected: boolean }) {
     <svg
       viewBox="0 0 32 44"
       fill="currentColor"
-      className={`w-8 h-11 transition-all duration-200 drop-shadow-sm ${
+      className={`w-6 h-9 transition-all duration-200 drop-shadow-sm ${
         selected ? 'text-[#FFD700]' : 'text-white/70'
       }`}
     >
@@ -52,18 +52,18 @@ function FormationPlayer({
       type="button"
       onClick={() => onToggle(player.name)}
       className="flex flex-col items-center gap-0.5 group relative"
-      style={{ minWidth: '56px' }}
+      style={{ minWidth: '44px', maxWidth: '52px' }}
     >
       <div
-        className={`relative p-1 rounded-full transition-all duration-200 ${
-          selected ? 'bg-[#FFD700]/25 shadow-lg' : 'hover:bg-white/10'
+        className={`relative p-0.5 rounded-full transition-all duration-200 ${
+          selected ? 'bg-[#FFD700]/25' : 'hover:bg-white/10'
         }`}
-        style={selected ? { boxShadow: '0 0 12px rgba(255,215,0,0.5)' } : {}}
+        style={selected ? { boxShadow: '0 0 10px rgba(255,215,0,0.45)' } : {}}
       >
         <PlayerSilhouette selected={selected} />
         {selected && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#FFD700] rounded-full flex items-center justify-center shadow">
-            <CheckIcon className="w-2.5 h-2.5 text-black" />
+          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-[#FFD700] rounded-full flex items-center justify-center shadow">
+            <CheckIcon className="w-2 h-2 text-black" />
           </span>
         )}
       </div>
@@ -71,7 +71,7 @@ function FormationPlayer({
         className={`text-center leading-tight font-semibold transition-colors duration-200 ${
           selected ? 'text-[#FFD700]' : 'text-white/80'
         }`}
-        style={{ fontSize: '9px', maxWidth: '56px' }}
+        style={{ fontSize: '8px', maxWidth: '48px' }}
       >
         {player.shortName}
       </span>
@@ -102,7 +102,7 @@ function PitchFormation({
     <div className="space-y-3">
       {/* Pitch */}
       <div
-        className="relative rounded-2xl overflow-hidden px-2 py-5"
+        className="relative rounded-2xl overflow-hidden px-1 py-3"
         style={{
           background: 'linear-gradient(180deg, #1a7a35 0%, #1f8c3e 30%, #1f8c3e 70%, #1a7a35 100%)',
         }}
@@ -124,9 +124,9 @@ function PitchFormation({
           <rect x="38" y="187" width="24" height="8" />
         </svg>
 
-        <div className="relative flex flex-col gap-4">
+        <div className="relative flex flex-col gap-2">
           {rows.map((row, rowIdx) => (
-            <div key={rowIdx} className="flex justify-center gap-1">
+            <div key={rowIdx} className="flex justify-center gap-0.5">
               {row.map((player) => (
                 <FormationPlayer
                   key={player.name}

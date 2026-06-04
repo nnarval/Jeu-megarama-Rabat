@@ -46,51 +46,47 @@ function formatDate(dateStr: string) {
   });
 }
 
+function formatScorers(scorers: string[]): string {
+  const counts: Record<string, number> = {};
+  for (const s of scorers) counts[s] = (counts[s] || 0) + 1;
+  return Object.entries(counts)
+    .map(([name, n]) => (n > 1 ? `${name} ×${n}` : name))
+    .join(', ');
+}
+
 function exportToCSV(match: MatchInfo, bets: Bet[], rankings?: RankedBet[]) {
   const matchLabel = `${match.team1.name} vs ${match.team2.name}`;
   const cell = (v: string) => `"${v.replace(/"/g, '""')}"`;
 
-  // Find max number of scorers across all rows (to know how many scorer columns to create)
-  const source = rankings && rankings.length > 0 ? rankings : bets;
-  const maxScorers = Math.max(0, ...source.map((r) => r.scorers.length));
-  const scorerHeaders = Array.from({ length: maxScorers }, (_, i) => `Buteur ${i + 1}`);
-
   let rows: string[][];
 
   if (rankings && rankings.length > 0) {
-    // With result — ranking view
     const header = [
-      'Match', 'Groupe', 'Date', 'Heure', 'Ville',
+      'Match', 'Groupe', 'Date', 'Ville',
       'Rang', 'Prénom', 'Nom', 'Instagram',
       `Score ${match.team1.name}`, `Score ${match.team2.name}`,
       'Résultat correct', 'Score exact',
-      'Nb buteurs corrects', 'Nb buteurs pariés',
-      ...scorerHeaders,
+      'Nb buteurs corrects', 'Nb buteurs pariés', 'Buteurs choisis',
       'Soumis le',
     ];
     rows = [header];
     for (const r of rankings) {
-      const scorerCells = Array.from({ length: maxScorers }, (_, i) => r.scorers[i] ?? '');
       rows.push([
-        matchLabel, match.group, match.date, match.time, match.city,
+        matchLabel, match.group, match.date, match.city,
         String(r.rank), r.firstName || '', r.lastName || '', `@${r.instagram}`,
         String(r.team1Score), String(r.team2Score),
         r.resultCorrect ? 'Oui' : 'Non',
         r.scoreExact ? 'Oui' : 'Non',
-        String(r.scorersMatched), String(r.scorersTotal),
-        ...scorerCells,
+        String(r.scorersMatched), String(r.scorersTotal), formatScorers(r.scorers),
         formatDate(r.createdAt),
       ]);
     }
   } else {
-    // Without result — raw bets
     const header = [
-      'Match', 'Groupe', 'Date', 'Heure', 'Ville',
+      'Match', 'Groupe', 'Date', 'Ville',
       'Prénom', 'Nom', 'Instagram',
       `Score ${match.team1.name}`, `Score ${match.team2.name}`,
-      'Résultat prédit',
-      'Nb buteurs pariés',
-      ...scorerHeaders,
+      'Résultat prédit', 'Nb buteurs pariés', 'Buteurs choisis',
       'Soumis le',
     ];
     rows = [header];
@@ -100,14 +96,11 @@ function exportToCSV(match: MatchInfo, bets: Bet[], rankings?: RankedBet[]) {
         : b.team2Score > b.team1Score
         ? `Victoire ${match.team2.name}`
         : 'Match nul';
-      const scorerCells = Array.from({ length: maxScorers }, (_, i) => b.scorers[i] ?? '');
       rows.push([
-        matchLabel, match.group, match.date, match.time, match.city,
+        matchLabel, match.group, match.date, match.city,
         b.firstName || '', b.lastName || '', `@${b.instagram}`,
         String(b.team1Score), String(b.team2Score),
-        result,
-        String(b.scorers.length),
-        ...scorerCells,
+        result, String(b.scorers.length), formatScorers(b.scorers),
         formatDate(b.createdAt),
       ]);
     }

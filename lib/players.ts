@@ -1,73 +1,70 @@
 export interface Player {
   name: string;
+  shortName: string;
   position: 'GK' | 'DEF' | 'MID' | 'FWD';
   team: 'brazil' | 'morocco';
+  starter: boolean;
 }
 
 export const BRAZIL_PLAYERS: Player[] = [
-  // Goalkeepers
-  { name: 'Alisson', position: 'GK', team: 'brazil' },
-  { name: 'Ederson', position: 'GK', team: 'brazil' },
-  { name: 'Bento', position: 'GK', team: 'brazil' },
-  // Defenders
-  { name: 'Danilo', position: 'DEF', team: 'brazil' },
-  { name: 'Éder Militão', position: 'DEF', team: 'brazil' },
-  { name: 'Marquinhos', position: 'DEF', team: 'brazil' },
-  { name: 'Gabriel Magalhães', position: 'DEF', team: 'brazil' },
-  { name: 'Wendell', position: 'DEF', team: 'brazil' },
-  { name: 'Alex Telles', position: 'DEF', team: 'brazil' },
-  { name: 'Guilherme Arana', position: 'DEF', team: 'brazil' },
-  // Midfielders
-  { name: 'Casemiro', position: 'MID', team: 'brazil' },
-  { name: 'Bruno Guimarães', position: 'MID', team: 'brazil' },
-  { name: 'Lucas Paquetá', position: 'MID', team: 'brazil' },
-  { name: 'Gerson', position: 'MID', team: 'brazil' },
-  { name: 'Andreas Pereira', position: 'MID', team: 'brazil' },
-  { name: 'Joelinton', position: 'MID', team: 'brazil' },
-  { name: 'Douglas Luiz', position: 'MID', team: 'brazil' },
-  // Forwards
-  { name: 'Vinicius Jr', position: 'FWD', team: 'brazil' },
-  { name: 'Rodrygo', position: 'FWD', team: 'brazil' },
-  { name: 'Raphinha', position: 'FWD', team: 'brazil' },
-  { name: 'Gabriel Martinelli', position: 'FWD', team: 'brazil' },
-  { name: 'Endrick', position: 'FWD', team: 'brazil' },
-  { name: 'Savinho', position: 'FWD', team: 'brazil' },
-  { name: 'Gabriel Jesus', position: 'FWD', team: 'brazil' },
-  { name: 'Matheus Cunha', position: 'FWD', team: 'brazil' },
-  { name: 'Richarlison', position: 'FWD', team: 'brazil' },
+  // === TITULAIRES (4-3-3) ===
+  { name: 'Alisson', shortName: 'Alisson', position: 'GK', team: 'brazil', starter: true },
+  { name: 'Danilo', shortName: 'Danilo', position: 'DEF', team: 'brazil', starter: true },
+  { name: 'Éder Militão', shortName: 'Militão', position: 'DEF', team: 'brazil', starter: true },
+  { name: 'Marquinhos', shortName: 'Marquinhos', position: 'DEF', team: 'brazil', starter: true },
+  { name: 'Guilherme Arana', shortName: 'Arana', position: 'DEF', team: 'brazil', starter: true },
+  { name: 'Casemiro', shortName: 'Casemiro', position: 'MID', team: 'brazil', starter: true },
+  { name: 'Bruno Guimarães', shortName: 'Guimarães', position: 'MID', team: 'brazil', starter: true },
+  { name: 'Lucas Paquetá', shortName: 'Paquetá', position: 'MID', team: 'brazil', starter: true },
+  { name: 'Raphinha', shortName: 'Raphinha', position: 'FWD', team: 'brazil', starter: true },
+  { name: 'Vinicius Jr', shortName: 'Vinicius Jr', position: 'FWD', team: 'brazil', starter: true },
+  { name: 'Rodrygo', shortName: 'Rodrygo', position: 'FWD', team: 'brazil', starter: true },
+  // === REMPLAÇANTS ===
+  { name: 'Ederson', shortName: 'Ederson', position: 'GK', team: 'brazil', starter: false },
+  { name: 'Bento', shortName: 'Bento', position: 'GK', team: 'brazil', starter: false },
+  { name: 'Gabriel Magalhães', shortName: 'G. Magalhães', position: 'DEF', team: 'brazil', starter: false },
+  { name: 'Wendell', shortName: 'Wendell', position: 'DEF', team: 'brazil', starter: false },
+  { name: 'Alex Telles', shortName: 'Telles', position: 'DEF', team: 'brazil', starter: false },
+  { name: 'Gerson', shortName: 'Gerson', position: 'MID', team: 'brazil', starter: false },
+  { name: 'Andreas Pereira', shortName: 'A. Pereira', position: 'MID', team: 'brazil', starter: false },
+  { name: 'Joelinton', shortName: 'Joelinton', position: 'MID', team: 'brazil', starter: false },
+  { name: 'Douglas Luiz', shortName: 'D. Luiz', position: 'MID', team: 'brazil', starter: false },
+  { name: 'Gabriel Martinelli', shortName: 'Martinelli', position: 'FWD', team: 'brazil', starter: false },
+  { name: 'Endrick', shortName: 'Endrick', position: 'FWD', team: 'brazil', starter: false },
+  { name: 'Savinho', shortName: 'Savinho', position: 'FWD', team: 'brazil', starter: false },
+  { name: 'Gabriel Jesus', shortName: 'G. Jesus', position: 'FWD', team: 'brazil', starter: false },
+  { name: 'Matheus Cunha', shortName: 'M. Cunha', position: 'FWD', team: 'brazil', starter: false },
+  { name: 'Richarlison', shortName: 'Richarlison', position: 'FWD', team: 'brazil', starter: false },
 ];
 
 export const MOROCCO_PLAYERS: Player[] = [
-  // Goalkeepers
-  { name: 'Yassine Bounou (Bono)', position: 'GK', team: 'morocco' },
-  { name: 'Munir Mohamedi', position: 'GK', team: 'morocco' },
-  { name: 'Anas Zniti', position: 'GK', team: 'morocco' },
-  // Defenders
-  { name: 'Achraf Hakimi', position: 'DEF', team: 'morocco' },
-  { name: 'Nayef Aguerd', position: 'DEF', team: 'morocco' },
-  { name: 'Romain Saïss', position: 'DEF', team: 'morocco' },
-  { name: 'Jawad El Yamiq', position: 'DEF', team: 'morocco' },
-  { name: 'Noussair Mazraoui', position: 'DEF', team: 'morocco' },
-  { name: 'Adam Masina', position: 'DEF', team: 'morocco' },
-  { name: 'Badr Benoun', position: 'DEF', team: 'morocco' },
-  // Midfielders
-  { name: 'Sofyan Amrabat', position: 'MID', team: 'morocco' },
-  { name: 'Azzedine Ounahi', position: 'MID', team: 'morocco' },
-  { name: 'Selim Amallah', position: 'MID', team: 'morocco' },
-  { name: 'Bilal El Khannouss', position: 'MID', team: 'morocco' },
-  { name: 'Abdelhamid Sabiri', position: 'MID', team: 'morocco' },
-  { name: 'Ilias Chair', position: 'MID', team: 'morocco' },
-  { name: 'Reda Tagnaouti', position: 'MID', team: 'morocco' },
-  // Forwards
-  { name: 'Hakim Ziyech', position: 'FWD', team: 'morocco' },
-  { name: 'Youssef En-Nesyri', position: 'FWD', team: 'morocco' },
-  { name: 'Soufiane Boufal', position: 'FWD', team: 'morocco' },
-  { name: 'Abde Ezzalzouli', position: 'FWD', team: 'morocco' },
-  { name: 'Brahim Díaz', position: 'FWD', team: 'morocco' },
-  { name: 'Ayoub El Kaabi', position: 'FWD', team: 'morocco' },
-  { name: 'Zakaria Aboukhlal', position: 'FWD', team: 'morocco' },
-  { name: 'Anass Zaroury', position: 'FWD', team: 'morocco' },
-  { name: 'Ryan Mmaee', position: 'FWD', team: 'morocco' },
+  // === TITULAIRES (4-3-3) ===
+  { name: 'Yassine Bounou', shortName: 'Bono', position: 'GK', team: 'morocco', starter: true },
+  { name: 'Achraf Hakimi', shortName: 'Hakimi', position: 'DEF', team: 'morocco', starter: true },
+  { name: 'Nayef Aguerd', shortName: 'Aguerd', position: 'DEF', team: 'morocco', starter: true },
+  { name: 'Romain Saïss', shortName: 'Saïss', position: 'DEF', team: 'morocco', starter: true },
+  { name: 'Noussair Mazraoui', shortName: 'Mazraoui', position: 'DEF', team: 'morocco', starter: true },
+  { name: 'Sofyan Amrabat', shortName: 'Amrabat', position: 'MID', team: 'morocco', starter: true },
+  { name: 'Azzedine Ounahi', shortName: 'Ounahi', position: 'MID', team: 'morocco', starter: true },
+  { name: 'Bilal El Khannouss', shortName: 'El Khannouss', position: 'MID', team: 'morocco', starter: true },
+  { name: 'Hakim Ziyech', shortName: 'Ziyech', position: 'FWD', team: 'morocco', starter: true },
+  { name: 'Youssef En-Nesyri', shortName: 'En-Nesyri', position: 'FWD', team: 'morocco', starter: true },
+  { name: 'Soufiane Boufal', shortName: 'Boufal', position: 'FWD', team: 'morocco', starter: true },
+  // === REMPLAÇANTS ===
+  { name: 'Munir Mohamedi', shortName: 'Mohamedi', position: 'GK', team: 'morocco', starter: false },
+  { name: 'Anas Zniti', shortName: 'Zniti', position: 'GK', team: 'morocco', starter: false },
+  { name: 'Jawad El Yamiq', shortName: 'El Yamiq', position: 'DEF', team: 'morocco', starter: false },
+  { name: 'Adam Masina', shortName: 'Masina', position: 'DEF', team: 'morocco', starter: false },
+  { name: 'Badr Benoun', shortName: 'Benoun', position: 'DEF', team: 'morocco', starter: false },
+  { name: 'Selim Amallah', shortName: 'Amallah', position: 'MID', team: 'morocco', starter: false },
+  { name: 'Abdelhamid Sabiri', shortName: 'Sabiri', position: 'MID', team: 'morocco', starter: false },
+  { name: 'Ilias Chair', shortName: 'I. Chair', position: 'MID', team: 'morocco', starter: false },
+  { name: 'Abde Ezzalzouli', shortName: 'Abde', position: 'FWD', team: 'morocco', starter: false },
+  { name: 'Brahim Díaz', shortName: 'B. Díaz', position: 'FWD', team: 'morocco', starter: false },
+  { name: 'Ayoub El Kaabi', shortName: 'El Kaabi', position: 'FWD', team: 'morocco', starter: false },
+  { name: 'Zakaria Aboukhlal', shortName: 'Aboukhlal', position: 'FWD', team: 'morocco', starter: false },
+  { name: 'Anass Zaroury', shortName: 'Zaroury', position: 'FWD', team: 'morocco', starter: false },
+  { name: 'Ryan Mmaee', shortName: 'Mmaee', position: 'FWD', team: 'morocco', starter: false },
 ];
 
 export const ALL_PLAYERS = [...BRAZIL_PLAYERS, ...MOROCCO_PLAYERS];

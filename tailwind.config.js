@@ -8,17 +8,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          green: '#22c55e',
-          'green-dark': '#16a34a',
-          'green-light': '#4ade80',
-          gold: '#f59e0b',
-          'gold-light': '#fbbf24',
-        },
-        dark: {
-          DEFAULT: '#0a0a0a',
+        mg: {
+          yellow: '#FFD700',
+          'yellow-dark': '#D4A900',
+          'yellow-light': '#FFE44D',
+          black: '#000000',
           card: '#111111',
-          border: '#1f1f1f',
+          border: '#222222',
           muted: '#2a2a2a',
         },
       },
@@ -27,7 +23,7 @@ module.exports = {
       },
       animation: {
         'fade-in': 'fadeIn 0.4s ease-in-out',
-        'slide-up': 'slideUp 0.4s ease-out',
+        'slide-up': 'slideUp 0.3s ease-out',
         pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
@@ -36,7 +32,7 @@ module.exports = {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(16px)' },
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },

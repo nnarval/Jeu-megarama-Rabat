@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { MATCHES, MatchInfo } from '@/lib/matches';
 import { getSquad } from '@/lib/squads';
@@ -136,73 +136,49 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   );
 }
 
-function QRCard({ match }: { match: MatchInfo }) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const url = `${BASE_URL}/${match.slug}`;
-
+function QRCodesTab() {
   const handleDownload = () => {
-    const canvas = document.querySelector(`#qr-${match.slug} canvas`) as HTMLCanvasElement;
+    const canvas = document.querySelector('#qr-central canvas') as HTMLCanvasElement;
     if (!canvas) return;
     const link = document.createElement('a');
-    link.download = `qr-${match.slug}.png`;
+    link.download = 'qr-jeu-megarama.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
   };
 
   return (
-    <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-5 flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-6 py-6">
       <div className="text-center">
-        <p className="font-black text-white text-sm">
-          {match.team1.flag} {match.team1.name}
-        </p>
-        <p className="text-gray-500 text-xs font-bold">vs</p>
-        <p className="font-black text-white text-sm">
-          {match.team2.flag} {match.team2.name}
-        </p>
-        <p className="text-[10px] text-gray-600 mt-1">{match.date} · {match.time}</p>
+        <h3 className="text-lg font-black text-white mb-1">QR Code Central</h3>
+        <p className="text-gray-500 text-sm">Affiche ce QR code pour tous les matchs — les clients choisissent le bon sur la page d'accueil.</p>
       </div>
 
       <div
-        id={`qr-${match.slug}`}
-        className="rounded-xl overflow-hidden p-3"
-        style={{ background: '#000' }}
+        id="qr-central"
+        className="rounded-2xl p-5"
+        style={{ background: '#000', border: '2px solid rgba(255,215,0,0.3)' }}
       >
         <QRCodeCanvas
-          value={url}
-          size={160}
+          value={BASE_URL}
+          size={240}
           bgColor="#000000"
           fgColor="#FFD700"
           level="M"
-          ref={canvasRef}
         />
       </div>
 
-      <p className="text-[9px] text-gray-600 text-center break-all max-w-[180px]">{url}</p>
+      <p className="text-xs text-gray-600">{BASE_URL}</p>
 
       <button
         onClick={handleDownload}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 transition-all"
+        className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-sm border transition-all"
+        style={{ borderColor: 'rgba(255,215,0,0.4)', color: '#FFD700', background: 'rgba(255,215,0,0.08)' }}
       >
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
         Télécharger PNG
       </button>
-    </div>
-  );
-}
-
-function QRCodesTab() {
-  return (
-    <div>
-      <p className="text-xs text-gray-500 mb-5">
-        QR codes noir/jaune Megarama — cliquez pour télécharger en PNG haute qualité.
-      </p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {MATCHES.map((match) => (
-          <QRCard key={match.slug} match={match} />
-        ))}
-      </div>
     </div>
   );
 }

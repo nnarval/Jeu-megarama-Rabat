@@ -381,7 +381,7 @@ export default function MatchBettingPage() {
             </span>
           </div>
           <h1 className="text-2xl font-black text-white tracking-tight mb-0.5">
-            PARI <span style={{ color: '#FFD700' }}>MEGARAMA</span>
+            Jeu <span style={{ color: '#FFD700' }}>Megarama</span>
           </h1>
           <p className="text-gray-400 text-base font-semibold mt-1">
             {match.team1.flag} {match.team1.name} — {match.team2.name} {match.team2.flag}

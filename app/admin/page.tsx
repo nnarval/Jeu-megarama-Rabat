@@ -150,6 +150,7 @@ export default function AdminPage() {
   const [resultSaved, setResultSaved] = useState(false);
 
   const [toggling, setToggling] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [tab, setTab] = useState<'bets' | 'rankings' | 'result'>('bets');
   const [search, setSearch] = useState('');
 
@@ -211,6 +212,36 @@ export default function AdminPage() {
     }, 10000);
     return () => clearInterval(interval);
   }, [authenticated, selectedMatchSlug, fetchData, fetchRankings, hasResult]);
+
+  const handleReset = async () => {
+    const confirmed = window.confirm(
+      `⚠️ Réinitialiser "${selectedMatch.team1.name} vs ${selectedMatch.team2.name}" ?\n\nCela supprimera TOUS les paris de ce match et rouvrira les paris.\n\nCette action est irréversible.`
+    );
+    if (!confirmed) return;
+    setResetting(true);
+    try {
+      const res = await fetch('/api/admin/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: ADMIN_PASSWORD, matchId: selectedMatchSlug }),
+      });
+      if (res.ok) {
+        setBets([]);
+        setRankings([]);
+        setBettingOpen(true);
+        setHasResult(false);
+        setRealTeam1Score(0);
+        setRealTeam2Score(0);
+        setRealScorers([]);
+        setResultSaved(false);
+        setTab('bets');
+      }
+    } catch {
+      // silent
+    } finally {
+      setResetting(false);
+    }
+  };
 
   const handleToggle = async () => {
     setToggling(true);
@@ -404,6 +435,21 @@ export default function AdminPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             Exporter CSV
+          </button>
+
+          <button
+            onClick={handleReset}
+            disabled={resetting}
+            className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-all disabled:opacity-50 ml-auto"
+          >
+            {resetting ? (
+              <span className="w-4 h-4 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            )}
+            Réinitialiser
           </button>
         </div>
 

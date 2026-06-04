@@ -9,10 +9,10 @@ datasource db {
 
 model Bet {
   id          String   @id @default(cuid())
-  matchId     String
+  matchId     String   @default("legacy")
   instagram   String
-  team1Score  Int
-  team2Score  Int
+  team1Score  Int      @default(0)
+  team2Score  Int      @default(0)
   scorers     String[]
   createdAt   DateTime @default(now())
 

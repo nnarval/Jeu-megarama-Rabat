@@ -1,8 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { MATCHES, MatchInfo } from '@/lib/matches';
 import { getSquad } from '@/lib/squads';
+
+const BASE_URL = 'https://paris-megarama.vercel.app';
 
 const ADMIN_PASSWORD = 'megarama2026';
 
@@ -133,6 +136,77 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   );
 }
 
+function QRCard({ match }: { match: MatchInfo }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const url = `${BASE_URL}/${match.slug}`;
+
+  const handleDownload = () => {
+    const canvas = document.querySelector(`#qr-${match.slug} canvas`) as HTMLCanvasElement;
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = `qr-${match.slug}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
+
+  return (
+    <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-5 flex flex-col items-center gap-4">
+      <div className="text-center">
+        <p className="font-black text-white text-sm">
+          {match.team1.flag} {match.team1.name}
+        </p>
+        <p className="text-gray-500 text-xs font-bold">vs</p>
+        <p className="font-black text-white text-sm">
+          {match.team2.flag} {match.team2.name}
+        </p>
+        <p className="text-[10px] text-gray-600 mt-1">{match.date} · {match.time}</p>
+      </div>
+
+      <div
+        id={`qr-${match.slug}`}
+        className="rounded-xl overflow-hidden p-3"
+        style={{ background: '#000' }}
+      >
+        <QRCodeCanvas
+          value={url}
+          size={160}
+          bgColor="#000000"
+          fgColor="#FFD700"
+          level="M"
+          ref={canvasRef}
+        />
+      </div>
+
+      <p className="text-[9px] text-gray-600 text-center break-all max-w-[180px]">{url}</p>
+
+      <button
+        onClick={handleDownload}
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border border-[#FFD700]/30 text-[#FFD700] hover:bg-[#FFD700]/10 transition-all"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Télécharger PNG
+      </button>
+    </div>
+  );
+}
+
+function QRCodesTab() {
+  return (
+    <div>
+      <p className="text-xs text-gray-500 mb-5">
+        QR codes noir/jaune Megarama — cliquez pour télécharger en PNG haute qualité.
+      </p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {MATCHES.map((match) => (
+          <QRCard key={match.slug} match={match} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [selectedMatchSlug, setSelectedMatchSlug] = useState<string>(MATCHES[0].slug);
@@ -151,7 +225,7 @@ export default function AdminPage() {
 
   const [toggling, setToggling] = useState(false);
   const [resetting, setResetting] = useState(false);
-  const [tab, setTab] = useState<'bets' | 'rankings' | 'result'>('bets');
+  const [tab, setTab] = useState<'bets' | 'rankings' | 'result' | 'qrcodes'>('bets');
   const [search, setSearch] = useState('');
 
   const selectedMatch = MATCHES.find((m) => m.slug === selectedMatchSlug) ?? MATCHES[0];
@@ -458,7 +532,8 @@ export default function AdminPage() {
           {[
             { key: 'bets', label: `Paris (${bets.length})` },
             { key: 'rankings', label: 'Classement' },
-            { key: 'result', label: 'Saisir résultat' },
+            { key: 'result', label: 'Résultat' },
+            { key: 'qrcodes', label: '⬛ QR Codes' },
           ].map((t) => (
             <button
               key={t.key}
@@ -650,6 +725,9 @@ export default function AdminPage() {
             )}
           </div>
         )}
+
+        {/* Tab: QR Codes */}
+        {tab === 'qrcodes' && <QRCodesTab />}
 
         {/* Tab: Result */}
         {tab === 'result' && (

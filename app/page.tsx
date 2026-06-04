@@ -21,7 +21,7 @@ export default function HomePage() {
             </span>
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight mb-1">
-            PARI <span style={{ color: '#FFD700' }}>MEGARAMA</span>
+            Jeu <span style={{ color: '#FFD700' }}>Megarama</span>
           </h1>
           <p className="text-gray-500 text-sm">Choisissez votre match et faites votre pronostic</p>
         </div>
@@ -39,11 +39,11 @@ export default function HomePage() {
                 <div className="flex-1 min-w-0">
                   {/* Teams */}
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl">{match.team1.flag}</span>
-                    <span className="text-white font-bold text-sm truncate">{match.team1.name}</span>
+                    <span className="text-base leading-none">{match.team1.flag}</span>
+                    <span className="text-white font-bold text-sm">{match.team1.name}</span>
                     <span className="text-gray-600 text-xs font-bold">vs</span>
-                    <span className="text-white font-bold text-sm truncate">{match.team2.name}</span>
-                    <span className="text-2xl">{match.team2.flag}</span>
+                    <span className="text-base leading-none">{match.team2.flag}</span>
+                    <span className="text-white font-bold text-sm">{match.team2.name}</span>
                   </div>
 
                   {/* Meta */}

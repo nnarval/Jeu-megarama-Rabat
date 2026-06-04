@@ -1,21 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getMatch } from '@/lib/matches';
 
 // POST /api/admin/result - set match result
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { password, brazilScore, moroccoScore, scorers } = body;
+    const { password, matchId, team1Score, team2Score, scorers } = body;
 
     if (password !== 'megarama2026') {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
+    if (!matchId || typeof matchId !== 'string') {
+      return NextResponse.json({ error: 'matchId invalide' }, { status: 400 });
+    }
+
+    if (!getMatch(matchId)) {
+      return NextResponse.json({ error: 'Match inconnu' }, { status: 400 });
+    }
+
     if (
-      typeof brazilScore !== 'number' ||
-      typeof moroccoScore !== 'number' ||
-      brazilScore < 0 ||
-      moroccoScore < 0
+      typeof team1Score !== 'number' ||
+      typeof team2Score !== 'number' ||
+      team1Score < 0 ||
+      team2Score < 0
     ) {
       return NextResponse.json({ error: 'Score invalide' }, { status: 400 });
     }
@@ -25,13 +34,13 @@ export async function POST(request: NextRequest) {
     }
 
     let config = await prisma.matchConfig.findUnique({
-      where: { id: 'brazil-morocco' },
+      where: { id: matchId },
     });
 
     if (!config) {
       config = await prisma.matchConfig.create({
         data: {
-          id: 'brazil-morocco',
+          id: matchId,
           bettingOpen: false,
           realScorers: [],
         },
@@ -39,10 +48,10 @@ export async function POST(request: NextRequest) {
     }
 
     const updated = await prisma.matchConfig.update({
-      where: { id: 'brazil-morocco' },
+      where: { id: matchId },
       data: {
-        realBrazilScore: Math.floor(brazilScore),
-        realMoroccoScore: Math.floor(moroccoScore),
+        realTeam1Score: Math.floor(team1Score),
+        realTeam2Score: Math.floor(team2Score),
         realScorers: scorers.filter((s: unknown) => typeof s === 'string'),
         bettingOpen: false,
       },

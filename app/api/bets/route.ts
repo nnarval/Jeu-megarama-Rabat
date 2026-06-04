@@ -1,12 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getMatch } from '@/lib/matches';
 
-// GET /api/bets - get all bets (admin)
-export async function GET() {
+// GET /api/bets?matchId=bresil-maroc - get all bets for a match (admin)
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const matchId = searchParams.get('matchId');
+
+    if (!matchId) {
+      return NextResponse.json({ error: 'matchId requis' }, { status: 400 });
+    }
+
+    if (!getMatch(matchId)) {
+      return NextResponse.json({ error: 'Match inconnu' }, { status: 400 });
+    }
+
     const bets = await prisma.bet.findMany({
+      where: { matchId },
       orderBy: { createdAt: 'desc' },
     });
+
     return NextResponse.json({ bets });
   } catch (error) {
     console.error('GET /api/bets error:', error);
@@ -18,9 +32,18 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { instagram, brazilScore, moroccoScore, scorers } = body;
+    const { matchId, instagram, team1Score, team2Score, scorers } = body;
 
-    // Validation
+    // Validate matchId
+    if (!matchId || typeof matchId !== 'string') {
+      return NextResponse.json({ error: 'matchId invalide' }, { status: 400 });
+    }
+
+    if (!getMatch(matchId)) {
+      return NextResponse.json({ error: 'Match inconnu' }, { status: 400 });
+    }
+
+    // Validate instagram
     if (!instagram || typeof instagram !== 'string') {
       return NextResponse.json({ error: 'Instagram invalide' }, { status: 400 });
     }
@@ -31,13 +54,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Instagram invalide' }, { status: 400 });
     }
 
+    // Validate scores
     if (
-      typeof brazilScore !== 'number' ||
-      typeof moroccoScore !== 'number' ||
-      brazilScore < 0 ||
-      brazilScore > 20 ||
-      moroccoScore < 0 ||
-      moroccoScore > 20
+      typeof team1Score !== 'number' ||
+      typeof team2Score !== 'number' ||
+      team1Score < 0 ||
+      team1Score > 20 ||
+      team2Score < 0 ||
+      team2Score > 20
     ) {
       return NextResponse.json({ error: 'Score invalide' }, { status: 400 });
     }
@@ -48,14 +72,13 @@ export async function POST(request: NextRequest) {
 
     // Check if betting is open
     let config = await prisma.matchConfig.findUnique({
-      where: { id: 'brazil-morocco' },
+      where: { id: matchId },
     });
 
     if (!config) {
-      // Create default config
       config = await prisma.matchConfig.create({
         data: {
-          id: 'brazil-morocco',
+          id: matchId,
           bettingOpen: true,
           realScorers: [],
         },
@@ -66,9 +89,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Les paris sont fermés' }, { status: 403 });
     }
 
-    // Check for duplicate instagram
+    // Check for duplicate instagram for this match
     const existing = await prisma.bet.findUnique({
-      where: { instagram: cleanInstagram },
+      where: { matchId_instagram: { matchId, instagram: cleanInstagram } },
     });
 
     if (existing) {
@@ -81,9 +104,10 @@ export async function POST(request: NextRequest) {
     // Create the bet
     const bet = await prisma.bet.create({
       data: {
+        matchId,
         instagram: cleanInstagram,
-        brazilScore: Math.floor(brazilScore),
-        moroccoScore: Math.floor(moroccoScore),
+        team1Score: Math.floor(team1Score),
+        team2Score: Math.floor(team2Score),
         scorers: scorers.filter((s: unknown) => typeof s === 'string'),
       },
     });

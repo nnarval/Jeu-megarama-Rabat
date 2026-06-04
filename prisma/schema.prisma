@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,18 +8,21 @@ datasource db {
 }
 
 model Bet {
-  id           String   @id @default(cuid())
-  instagram    String   @unique
-  brazilScore  Int
-  moroccoScore Int
-  scorers      String[]
-  createdAt    DateTime @default(now())
+  id          String   @id @default(cuid())
+  matchId     String
+  instagram   String
+  team1Score  Int
+  team2Score  Int
+  scorers     String[]
+  createdAt   DateTime @default(now())
+
+  @@unique([matchId, instagram])
 }
 
 model MatchConfig {
-  id               String   @id @default("brazil-morocco")
-  bettingOpen      Boolean  @default(true)
-  realBrazilScore  Int?
-  realMoroccoScore Int?
-  realScorers      String[]
+  id             String   @id
+  bettingOpen    Boolean  @default(true)
+  realTeam1Score Int?
+  realTeam2Score Int?
+  realScorers    String[]
 }

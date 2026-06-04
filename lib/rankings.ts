@@ -1,10 +1,11 @@
-export type MatchResult = 'brazil' | 'morocco' | 'draw';
+export type MatchResult = 'team1' | 'team2' | 'draw';
 
 export interface BetData {
   id: string;
+  matchId: string;
   instagram: string;
-  brazilScore: number;
-  moroccoScore: number;
+  team1Score: number;
+  team2Score: number;
   scorers: string[];
   createdAt: Date;
 }
@@ -17,19 +18,19 @@ export interface RankedBet extends BetData {
   scorersTotal: number;
 }
 
-function getResult(brazil: number, morocco: number): MatchResult {
-  if (brazil > morocco) return 'brazil';
-  if (morocco > brazil) return 'morocco';
+function getResult(team1: number, team2: number): MatchResult {
+  if (team1 > team2) return 'team1';
+  if (team2 > team1) return 'team2';
   return 'draw';
 }
 
 export function computeRankings(
   bets: BetData[],
-  realBrazilScore: number,
-  realMoroccoScore: number,
+  realTeam1Score: number,
+  realTeam2Score: number,
   realScorers: string[]
 ): RankedBet[] {
-  const realResult = getResult(realBrazilScore, realMoroccoScore);
+  const realResult = getResult(realTeam1Score, realTeam2Score);
   const realScorersSet = new Set(realScorers.map((s) => s.toLowerCase().trim()));
 
   const scored: Array<BetData & {
@@ -38,10 +39,10 @@ export function computeRankings(
     scorersMatched: number;
     scorersTotal: number;
   }> = bets.map((bet) => {
-    const betResult = getResult(bet.brazilScore, bet.moroccoScore);
+    const betResult = getResult(bet.team1Score, bet.team2Score);
     const resultCorrect = betResult === realResult;
     const scoreExact =
-      bet.brazilScore === realBrazilScore && bet.moroccoScore === realMoroccoScore;
+      bet.team1Score === realTeam1Score && bet.team2Score === realTeam2Score;
 
     const scorersMatched = bet.scorers.filter((s) =>
       realScorersSet.has(s.toLowerCase().trim())

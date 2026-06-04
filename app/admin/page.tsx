@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { BRAZIL_PLAYERS, MOROCCO_PLAYERS } from '@/lib/players';
+import { MATCHES, MatchInfo } from '@/lib/matches';
+import { getSquad } from '@/lib/squads';
 
 const ADMIN_PASSWORD = 'megarama2026';
 
 interface Bet {
   id: string;
+  matchId: string;
   instagram: string;
-  brazilScore: number;
-  moroccoScore: number;
+  team1Score: number;
+  team2Score: number;
   scorers: string[];
   createdAt: string;
 }
@@ -22,16 +24,9 @@ interface RankedBet extends Bet {
   scorersTotal: number;
 }
 
-interface MatchConfig {
-  bettingOpen: boolean;
-  realBrazilScore?: number;
-  realMoroccoScore?: number;
-  realScorers?: string[];
-}
-
-function getResultLabel(brazil: number, morocco: number) {
-  if (brazil > morocco) return { label: 'Brésil 🇧🇷', color: 'text-yellow-400' };
-  if (morocco > brazil) return { label: 'Maroc 🇲🇦', color: 'text-green-400' };
+function getResultLabel(match: MatchInfo, t1: number, t2: number) {
+  if (t1 > t2) return { label: `${match.team1.name} ${match.team1.flag}`, color: 'text-yellow-400' };
+  if (t2 > t1) return { label: `${match.team2.name} ${match.team2.flag}`, color: 'text-blue-400' };
   return { label: 'Nul', color: 'text-gray-400' };
 }
 
@@ -46,17 +41,19 @@ function formatDate(dateStr: string) {
   });
 }
 
-function exportToCSV(bets: Bet[], rankings?: RankedBet[]) {
+function exportToCSV(match: MatchInfo, bets: Bet[], rankings?: RankedBet[]) {
   const rows: string[][] = [];
+  const matchLabel = `${match.team1.name} vs ${match.team2.name}`;
 
   if (rankings && rankings.length > 0) {
-    rows.push(['Rang', 'Instagram', 'Score Brésil', 'Score Maroc', 'Résultat correct', 'Score exact', 'Buteurs corrects', 'Buteurs pariés', 'Date']);
+    rows.push(['Match', 'Rang', 'Instagram', `Score ${match.team1.name}`, `Score ${match.team2.name}`, 'Résultat correct', 'Score exact', 'Buteurs corrects', 'Buteurs pariés', 'Date']);
     for (const r of rankings) {
       rows.push([
+        matchLabel,
         String(r.rank),
         `@${r.instagram}`,
-        String(r.brazilScore),
-        String(r.moroccoScore),
+        String(r.team1Score),
+        String(r.team2Score),
         r.resultCorrect ? 'Oui' : 'Non',
         r.scoreExact ? 'Oui' : 'Non',
         `${r.scorersMatched}/${r.scorersTotal}`,
@@ -65,12 +62,13 @@ function exportToCSV(bets: Bet[], rankings?: RankedBet[]) {
       ]);
     }
   } else {
-    rows.push(['Instagram', 'Score Brésil', 'Score Maroc', 'Buteurs', 'Date']);
+    rows.push(['Match', 'Instagram', `Score ${match.team1.name}`, `Score ${match.team2.name}`, 'Buteurs', 'Date']);
     for (const b of bets) {
       rows.push([
+        matchLabel,
         `@${b.instagram}`,
-        String(b.brazilScore),
-        String(b.moroccoScore),
+        String(b.team1Score),
+        String(b.team2Score),
         b.scorers.join('; '),
         formatDate(b.createdAt),
       ]);
@@ -85,12 +83,11 @@ function exportToCSV(bets: Bet[], rankings?: RankedBet[]) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `pari-megarama-${new Date().toISOString().split('T')[0]}.csv`;
+  a.download = `pari-megarama-${match.slug}-${new Date().toISOString().split('T')[0]}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
 
-// Login screen
 function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -119,13 +116,14 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             onChange={(e) => { setPassword(e.target.value); setError(''); }}
             onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
             placeholder="Mot de passe"
-            className="w-full bg-[#0a0a0a] border-2 border-[#2a2a2a] focus:border-green-500/60 rounded-xl px-4 py-4 text-white placeholder-gray-700 focus:outline-none transition-colors"
+            className="w-full bg-[#0a0a0a] border-2 border-[#2a2a2a] focus:border-[#FFD700]/60 rounded-xl px-4 py-4 text-white placeholder-gray-700 focus:outline-none transition-colors"
           />
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <button
             onClick={handleLogin}
             disabled={!password}
-            className="w-full bg-green-500 hover:bg-green-400 disabled:bg-[#1f1f1f] disabled:text-gray-600 text-white font-bold py-4 rounded-xl transition-all"
+            className="w-full disabled:opacity-40 disabled:cursor-not-allowed text-black font-bold py-4 rounded-xl transition-all"
+            style={{ background: '#FFD700' }}
           >
             Connexion
           </button>
@@ -137,6 +135,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
+  const [selectedMatchSlug, setSelectedMatchSlug] = useState<string>(MATCHES[0].slug);
   const [bets, setBets] = useState<Bet[]>([]);
   const [bettingOpen, setBettingOpen] = useState(true);
   const [rankings, setRankings] = useState<RankedBet[]>([]);
@@ -144,60 +143,74 @@ export default function AdminPage() {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   // Result form state
-  const [realBrazilScore, setRealBrazilScore] = useState(0);
-  const [realMoroccoScore, setRealMoroccoScore] = useState(0);
+  const [realTeam1Score, setRealTeam1Score] = useState(0);
+  const [realTeam2Score, setRealTeam2Score] = useState(0);
   const [realScorers, setRealScorers] = useState<string[]>([]);
   const [savingResult, setSavingResult] = useState(false);
   const [resultSaved, setResultSaved] = useState(false);
 
-  // Toggling
   const [toggling, setToggling] = useState(false);
-
-  // Active tab
   const [tab, setTab] = useState<'bets' | 'rankings' | 'result'>('bets');
-
-  // Search
   const [search, setSearch] = useState('');
 
-  const fetchData = useCallback(async () => {
+  const selectedMatch = MATCHES.find((m) => m.slug === selectedMatchSlug) ?? MATCHES[0];
+
+  const fetchData = useCallback(async (matchId: string) => {
     try {
       const [betsRes, statusRes] = await Promise.all([
-        fetch('/api/bets'),
-        fetch('/api/status'),
+        fetch(`/api/bets?matchId=${matchId}`),
+        fetch(`/api/status?matchId=${matchId}`),
       ]);
       const betsData = await betsRes.json();
       const statusData = await statusRes.json();
       if (betsData.bets) setBets(betsData.bets);
-      setBettingOpen(statusData.bettingOpen);
-      setHasResult(statusData.hasResult);
+      setBettingOpen(statusData.bettingOpen ?? true);
+      setHasResult(statusData.hasResult ?? false);
       setLastRefresh(new Date());
     } catch {
       // silent
     }
   }, []);
 
-  const fetchRankings = useCallback(async () => {
+  const fetchRankings = useCallback(async (matchId: string) => {
     try {
-      const res = await fetch('/api/rankings');
+      const res = await fetch(`/api/rankings?matchId=${matchId}`);
       if (res.ok) {
         const data = await res.json();
         setRankings(data.rankings || []);
+      } else {
+        setRankings([]);
       }
     } catch {
-      // silent
+      setRankings([]);
     }
   }, []);
 
+  // When match changes, reset state and fetch fresh data
   useEffect(() => {
     if (!authenticated) return;
-    fetchData();
-    fetchRankings();
+    setBets([]);
+    setRankings([]);
+    setHasResult(false);
+    setRealTeam1Score(0);
+    setRealTeam2Score(0);
+    setRealScorers([]);
+    setResultSaved(false);
+    setTab('bets');
+    setSearch('');
+    fetchData(selectedMatchSlug);
+    fetchRankings(selectedMatchSlug);
+  }, [authenticated, selectedMatchSlug, fetchData, fetchRankings]);
+
+  // Auto-refresh every 10s
+  useEffect(() => {
+    if (!authenticated) return;
     const interval = setInterval(() => {
-      fetchData();
-      if (hasResult) fetchRankings();
+      fetchData(selectedMatchSlug);
+      if (hasResult) fetchRankings(selectedMatchSlug);
     }, 10000);
     return () => clearInterval(interval);
-  }, [authenticated, fetchData, fetchRankings, hasResult]);
+  }, [authenticated, selectedMatchSlug, fetchData, fetchRankings, hasResult]);
 
   const handleToggle = async () => {
     setToggling(true);
@@ -205,7 +218,7 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/toggle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: ADMIN_PASSWORD }),
+        body: JSON.stringify({ password: ADMIN_PASSWORD, matchId: selectedMatchSlug }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -226,15 +239,16 @@ export default function AdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           password: ADMIN_PASSWORD,
-          brazilScore: realBrazilScore,
-          moroccoScore: realMoroccoScore,
+          matchId: selectedMatchSlug,
+          team1Score: realTeam1Score,
+          team2Score: realTeam2Score,
           scorers: realScorers,
         }),
       });
       if (res.ok) {
         setResultSaved(true);
         setHasResult(true);
-        await fetchRankings();
+        await fetchRankings(selectedMatchSlug);
         setTab('rankings');
       }
     } catch {
@@ -254,6 +268,9 @@ export default function AdminPage() {
     ? bets.filter((b) => b.instagram.toLowerCase().includes(search.toLowerCase()))
     : bets;
 
+  const team1Squad = getSquad(selectedMatch.team1.squadKey);
+  const team2Squad = getSquad(selectedMatch.team2.squadKey);
+
   if (!authenticated) {
     return <LoginScreen onLogin={() => setAuthenticated(true)} />;
   }
@@ -265,7 +282,7 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-black text-white">Admin Pari Megarama</h1>
-            <p className="text-xs text-gray-500">🇧🇷 Brésil vs Maroc 🇲🇦 — Coupe du Monde 2026</p>
+            <p className="text-xs text-gray-500">Coupe du Monde 2026</p>
           </div>
           <div className="flex items-center gap-3">
             {lastRefresh && (
@@ -274,7 +291,7 @@ export default function AdminPage() {
               </span>
             )}
             <button
-              onClick={fetchData}
+              onClick={() => { fetchData(selectedMatchSlug); fetchRankings(selectedMatchSlug); }}
               className="p-2 rounded-lg bg-[#1a1a1a] hover:bg-[#222] border border-[#2a2a2a] text-gray-400 transition-all"
               title="Rafraîchir"
             >
@@ -287,6 +304,50 @@ export default function AdminPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+
+        {/* Match selector */}
+        <div className="mb-6">
+          <label className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-2 block">
+            Match sélectionné
+          </label>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {MATCHES.map((match) => (
+              <button
+                key={match.slug}
+                onClick={() => setSelectedMatchSlug(match.slug)}
+                className={`text-left px-4 py-3 rounded-xl border transition-all text-sm ${
+                  selectedMatchSlug === match.slug
+                    ? 'border-[#FFD700]/50 text-black font-bold'
+                    : 'border-[#1f1f1f] bg-[#111] text-gray-400 hover:border-[#2a2a2a] hover:text-gray-200'
+                }`}
+                style={selectedMatchSlug === match.slug ? { background: '#FFD700' } : {}}
+              >
+                <div className="font-bold">
+                  {match.team1.flag} {match.team1.name} vs {match.team2.name} {match.team2.flag}
+                </div>
+                <div className={`text-xs mt-0.5 ${selectedMatchSlug === match.slug ? 'text-black/60' : 'text-gray-600'}`}>
+                  {match.date} · {match.time} · {match.city}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Match header */}
+        <div
+          className="rounded-2xl border border-[#1f1f1f] px-5 py-4 mb-6 flex items-center gap-3"
+          style={{ background: 'rgba(255,215,0,0.04)' }}
+        >
+          <div className="text-2xl">{selectedMatch.team1.flag}</div>
+          <div>
+            <p className="font-black text-white text-base">
+              {selectedMatch.team1.name} vs {selectedMatch.team2.name}
+            </p>
+            <p className="text-xs text-gray-500">{selectedMatch.date} · {selectedMatch.time} · {selectedMatch.city} · {selectedMatch.group}</p>
+          </div>
+          <div className="text-2xl ml-auto">{selectedMatch.team2.flag}</div>
+        </div>
+
         {/* Stats bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <div className="bg-[#111] border border-[#1f1f1f] rounded-xl p-4">
@@ -309,14 +370,14 @@ export default function AdminPage() {
             </p>
           </div>
           <div className="bg-[#111] border border-[#1f1f1f] rounded-xl p-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Gagnants (top 5)</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Top 5</p>
             <p className="text-sm font-bold text-white">
               {hasResult ? `${rankings.filter(r => r.rank <= 5).length} joueurs` : '—'}
             </p>
           </div>
         </div>
 
-        {/* Toggle button */}
+        {/* Actions */}
         <div className="flex flex-wrap gap-3 mb-6">
           <button
             onClick={handleToggle}
@@ -336,7 +397,7 @@ export default function AdminPage() {
           </button>
 
           <button
-            onClick={() => exportToCSV(bets, hasResult ? rankings : undefined)}
+            onClick={() => exportToCSV(selectedMatch, bets, hasResult ? rankings : undefined)}
             className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm border border-[#2a2a2a] text-gray-400 hover:bg-[#1a1a1a] transition-all"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -358,9 +419,10 @@ export default function AdminPage() {
               onClick={() => setTab(t.key as typeof tab)}
               className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                 tab === t.key
-                  ? 'bg-green-500 text-white shadow-lg shadow-green-500/20'
+                  ? 'text-black shadow-lg'
                   : 'text-gray-500 hover:text-gray-300'
               }`}
+              style={tab === t.key ? { background: '#FFD700' } : {}}
             >
               {t.label}
             </button>
@@ -369,14 +431,14 @@ export default function AdminPage() {
 
         {/* Tab: Bets */}
         {tab === 'bets' && (
-          <div className="animate-fade-in">
+          <div>
             <div className="mb-4">
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Rechercher par Instagram..."
-                className="w-full max-w-xs bg-[#111] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-green-500/60 transition-colors"
+                className="w-full max-w-xs bg-[#111] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-[#FFD700]/60 transition-colors"
               />
             </div>
 
@@ -400,7 +462,7 @@ export default function AdminPage() {
                   </thead>
                   <tbody className="divide-y divide-[#111]">
                     {filteredBets.map((bet, i) => {
-                      const { label, color } = getResultLabel(bet.brazilScore, bet.moroccoScore);
+                      const { label, color } = getResultLabel(selectedMatch, bet.team1Score, bet.team2Score);
                       return (
                         <tr key={bet.id} className="hover:bg-[#111] transition-colors">
                           <td className="py-3 px-4 text-gray-600 text-xs">{i + 1}</td>
@@ -409,7 +471,7 @@ export default function AdminPage() {
                           </td>
                           <td className="py-3 px-4">
                             <span className="font-bold text-white font-mono">
-                              {bet.brazilScore} — {bet.moroccoScore}
+                              {bet.team1Score} — {bet.team2Score}
                             </span>
                           </td>
                           <td className={`py-3 px-4 text-xs font-semibold hidden sm:table-cell ${color}`}>{label}</td>
@@ -438,7 +500,7 @@ export default function AdminPage() {
 
         {/* Tab: Rankings */}
         {tab === 'rankings' && (
-          <div className="animate-fade-in">
+          <div>
             {!hasResult ? (
               <div className="text-center py-16">
                 <p className="text-5xl mb-4">🏆</p>
@@ -446,7 +508,7 @@ export default function AdminPage() {
                 <p className="text-gray-600 text-sm">Saisissez le résultat du match pour afficher le classement</p>
                 <button
                   onClick={() => setTab('result')}
-                  className="mt-4 px-5 py-3 bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl text-sm font-semibold hover:bg-green-500/20 transition-all"
+                  className="mt-4 px-5 py-3 bg-[#FFD700]/10 border border-[#FFD700]/30 text-[#FFD700] rounded-xl text-sm font-semibold hover:bg-[#FFD700]/20 transition-all"
                 >
                   Saisir le résultat →
                 </button>
@@ -458,7 +520,6 @@ export default function AdminPage() {
               </div>
             ) : (
               <div>
-                {/* Top 5 winners */}
                 <div className="mb-6">
                   <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">
                     🥇 Top 5 — Gagnants
@@ -490,7 +551,7 @@ export default function AdminPage() {
                         </div>
                         <div className="text-right flex-shrink-0">
                           <span className="font-bold text-white font-mono text-sm">
-                            {r.brazilScore}–{r.moroccoScore}
+                            {r.team1Score}–{r.team2Score}
                           </span>
                         </div>
                       </div>
@@ -498,7 +559,6 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Full rankings table */}
                 <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">
                   Classement complet
                 </h3>
@@ -516,14 +576,14 @@ export default function AdminPage() {
                     </thead>
                     <tbody className="divide-y divide-[#0f0f0f]">
                       {rankings.map((r) => (
-                        <tr key={r.id} className={`hover:bg-[#0f0f0f] transition-colors ${r.rank <= 5 ? 'bg-green-500/5' : ''}`}>
+                        <tr key={r.id} className={`hover:bg-[#0f0f0f] transition-colors ${r.rank <= 5 ? 'bg-[#FFD700]/5' : ''}`}>
                           <td className="py-3 px-3">
                             <span className={`font-bold ${r.rank === 1 ? 'text-yellow-400' : r.rank === 2 ? 'text-gray-300' : r.rank === 3 ? 'text-amber-600' : 'text-gray-600'}`}>
                               #{r.rank}
                             </span>
                           </td>
                           <td className="py-3 px-3 font-semibold text-white">@{r.instagram}</td>
-                          <td className="py-3 px-3 font-mono font-bold text-white">{r.brazilScore}–{r.moroccoScore}</td>
+                          <td className="py-3 px-3 font-mono font-bold text-white">{r.team1Score}–{r.team2Score}</td>
                           <td className={`py-3 px-3 text-xs font-semibold hidden sm:table-cell ${r.resultCorrect ? 'text-green-400' : 'text-red-400'}`}>
                             {r.resultCorrect ? '✓' : '✗'}
                           </td>
@@ -547,7 +607,7 @@ export default function AdminPage() {
 
         {/* Tab: Result */}
         {tab === 'result' && (
-          <div className="animate-fade-in max-w-2xl">
+          <div className="max-w-2xl">
             {resultSaved && (
               <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-6 flex items-center gap-3">
                 <span className="text-green-400 text-xl">✓</span>
@@ -560,38 +620,42 @@ export default function AdminPage() {
 
               <div className="flex items-center gap-4 mb-2">
                 <div className="flex-1">
-                  <label className="text-xs text-gray-500 uppercase tracking-wider mb-2 block font-semibold">🇧🇷 Brésil</label>
+                  <label className="text-xs text-gray-500 uppercase tracking-wider mb-2 block font-semibold">
+                    {selectedMatch.team1.flag} {selectedMatch.team1.name}
+                  </label>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
-                      onClick={() => setRealBrazilScore(Math.max(0, realBrazilScore - 1))}
+                      onClick={() => setRealTeam1Score(Math.max(0, realTeam1Score - 1))}
                       className="w-9 h-9 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-white font-bold hover:bg-[#222] transition-all"
                     >—</button>
                     <div className="flex-1 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl py-3 text-center text-3xl font-black text-white">
-                      {realBrazilScore}
+                      {realTeam1Score}
                     </div>
                     <button
                       type="button"
-                      onClick={() => setRealBrazilScore(Math.min(20, realBrazilScore + 1))}
+                      onClick={() => setRealTeam1Score(Math.min(20, realTeam1Score + 1))}
                       className="w-9 h-9 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-white font-bold hover:bg-[#222] transition-all"
                     >+</button>
                   </div>
                 </div>
                 <div className="text-gray-600 text-2xl font-light mt-5">:</div>
                 <div className="flex-1">
-                  <label className="text-xs text-gray-500 uppercase tracking-wider mb-2 block font-semibold">🇲🇦 Maroc</label>
+                  <label className="text-xs text-gray-500 uppercase tracking-wider mb-2 block font-semibold">
+                    {selectedMatch.team2.flag} {selectedMatch.team2.name}
+                  </label>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
-                      onClick={() => setRealMoroccoScore(Math.max(0, realMoroccoScore - 1))}
+                      onClick={() => setRealTeam2Score(Math.max(0, realTeam2Score - 1))}
                       className="w-9 h-9 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-white font-bold hover:bg-[#222] transition-all"
                     >—</button>
                     <div className="flex-1 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl py-3 text-center text-3xl font-black text-white">
-                      {realMoroccoScore}
+                      {realTeam2Score}
                     </div>
                     <button
                       type="button"
-                      onClick={() => setRealMoroccoScore(Math.min(20, realMoroccoScore + 1))}
+                      onClick={() => setRealTeam2Score(Math.min(20, realTeam2Score + 1))}
                       className="w-9 h-9 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-white font-bold hover:bg-[#222] transition-all"
                     >+</button>
                   </div>
@@ -600,7 +664,7 @@ export default function AdminPage() {
 
               <div className="text-center mt-3">
                 <span className="text-xs text-gray-500">
-                  → {getResultLabel(realBrazilScore, realMoroccoScore).label}
+                  → {getResultLabel(selectedMatch, realTeam1Score, realTeam2Score).label}
                 </span>
               </div>
             </div>
@@ -629,11 +693,13 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {/* Brésil */}
+              {/* Team 1 */}
               <div className="mb-4">
-                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">🇧🇷 Brésil</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">
+                  {selectedMatch.team1.flag} {selectedMatch.team1.name}
+                </p>
                 <div className="grid grid-cols-2 gap-1.5">
-                  {BRAZIL_PLAYERS.filter(p => p.position !== 'GK').map((player) => (
+                  {team1Squad.filter(p => p.position !== 'GK').map((player) => (
                     <button
                       key={player.name}
                       type="button"
@@ -645,16 +711,19 @@ export default function AdminPage() {
                       }`}
                     >
                       {player.name}
+                      {!player.starter && <span className="text-gray-600 ml-1">(R)</span>}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Maroc */}
+              {/* Team 2 */}
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">🇲🇦 Maroc</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">
+                  {selectedMatch.team2.flag} {selectedMatch.team2.name}
+                </p>
                 <div className="grid grid-cols-2 gap-1.5">
-                  {MOROCCO_PLAYERS.filter(p => p.position !== 'GK').map((player) => (
+                  {team2Squad.filter(p => p.position !== 'GK').map((player) => (
                     <button
                       key={player.name}
                       type="button"
@@ -666,6 +735,7 @@ export default function AdminPage() {
                       }`}
                     >
                       {player.name}
+                      {!player.starter && <span className="text-gray-600 ml-1">(R)</span>}
                     </button>
                   ))}
                 </div>

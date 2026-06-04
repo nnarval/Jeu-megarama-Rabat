@@ -1,37 +1,50 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { computeRankings } from '@/lib/rankings';
+import { getMatch } from '@/lib/matches';
 
-// GET /api/rankings - get computed rankings
-export async function GET() {
+// GET /api/rankings?matchId=bresil-maroc - get computed rankings
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const matchId = searchParams.get('matchId');
+
+    if (!matchId) {
+      return NextResponse.json({ error: 'matchId requis' }, { status: 400 });
+    }
+
+    if (!getMatch(matchId)) {
+      return NextResponse.json({ error: 'Match inconnu' }, { status: 400 });
+    }
+
     const config = await prisma.matchConfig.findUnique({
-      where: { id: 'brazil-morocco' },
+      where: { id: matchId },
     });
 
     if (
       !config ||
-      config.realBrazilScore === null ||
-      config.realMoroccoScore === null
+      config.realTeam1Score === null ||
+      config.realTeam2Score === null
     ) {
       return NextResponse.json({ error: 'Résultat non encore saisi' }, { status: 404 });
     }
 
     const bets = await prisma.bet.findMany({
+      where: { matchId },
       orderBy: { createdAt: 'asc' },
     });
 
     const rankings = computeRankings(
       bets,
-      config.realBrazilScore,
-      config.realMoroccoScore,
+      config.realTeam1Score,
+      config.realTeam2Score,
       config.realScorers
     );
 
     return NextResponse.json({
       rankings,
-      realBrazilScore: config.realBrazilScore,
-      realMoroccoScore: config.realMoroccoScore,
+      realTeam1Score: config.realTeam1Score,
+      realTeam2Score: config.realTeam2Score,
       realScorers: config.realScorers,
     });
   } catch (error) {

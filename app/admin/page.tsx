@@ -47,52 +47,78 @@ function formatDate(dateStr: string) {
 }
 
 function exportToCSV(match: MatchInfo, bets: Bet[], rankings?: RankedBet[]) {
-  const rows: string[][] = [];
   const matchLabel = `${match.team1.name} vs ${match.team2.name}`;
+  const cell = (v: string) => `"${v.replace(/"/g, '""')}"`;
+
+  // Find max number of scorers across all rows (to know how many scorer columns to create)
+  const source = rankings && rankings.length > 0 ? rankings : bets;
+  const maxScorers = Math.max(0, ...source.map((r) => r.scorers.length));
+  const scorerHeaders = Array.from({ length: maxScorers }, (_, i) => `Buteur ${i + 1}`);
+
+  let rows: string[][];
 
   if (rankings && rankings.length > 0) {
-    rows.push(['Match', 'Rang', 'Prénom', 'Nom', 'Instagram', `Score ${match.team1.name}`, `Score ${match.team2.name}`, 'Résultat correct', 'Score exact', 'Buteurs corrects', 'Buteurs pariés', 'Date']);
+    // With result — ranking view
+    const header = [
+      'Match', 'Groupe', 'Date', 'Heure', 'Ville',
+      'Rang', 'Prénom', 'Nom', 'Instagram',
+      `Score ${match.team1.name}`, `Score ${match.team2.name}`,
+      'Résultat correct', 'Score exact',
+      'Nb buteurs corrects', 'Nb buteurs pariés',
+      ...scorerHeaders,
+      'Soumis le',
+    ];
+    rows = [header];
     for (const r of rankings) {
+      const scorerCells = Array.from({ length: maxScorers }, (_, i) => r.scorers[i] ?? '');
       rows.push([
-        matchLabel,
-        String(r.rank),
-        r.firstName || '',
-        r.lastName || '',
-        `@${r.instagram}`,
-        String(r.team1Score),
-        String(r.team2Score),
+        matchLabel, match.group, match.date, match.time, match.city,
+        String(r.rank), r.firstName || '', r.lastName || '', `@${r.instagram}`,
+        String(r.team1Score), String(r.team2Score),
         r.resultCorrect ? 'Oui' : 'Non',
         r.scoreExact ? 'Oui' : 'Non',
-        `${r.scorersMatched}/${r.scorersTotal}`,
-        r.scorers.join('; '),
+        String(r.scorersMatched), String(r.scorersTotal),
+        ...scorerCells,
         formatDate(r.createdAt),
       ]);
     }
   } else {
-    rows.push(['Match', 'Prénom', 'Nom', 'Instagram', `Score ${match.team1.name}`, `Score ${match.team2.name}`, 'Buteurs', 'Date']);
+    // Without result — raw bets
+    const header = [
+      'Match', 'Groupe', 'Date', 'Heure', 'Ville',
+      'Prénom', 'Nom', 'Instagram',
+      `Score ${match.team1.name}`, `Score ${match.team2.name}`,
+      'Résultat prédit',
+      'Nb buteurs pariés',
+      ...scorerHeaders,
+      'Soumis le',
+    ];
+    rows = [header];
     for (const b of bets) {
+      const result = b.team1Score > b.team2Score
+        ? `Victoire ${match.team1.name}`
+        : b.team2Score > b.team1Score
+        ? `Victoire ${match.team2.name}`
+        : 'Match nul';
+      const scorerCells = Array.from({ length: maxScorers }, (_, i) => b.scorers[i] ?? '');
       rows.push([
-        matchLabel,
-        b.firstName || '',
-        b.lastName || '',
-        `@${b.instagram}`,
-        String(b.team1Score),
-        String(b.team2Score),
-        b.scorers.join('; '),
+        matchLabel, match.group, match.date, match.time, match.city,
+        b.firstName || '', b.lastName || '', `@${b.instagram}`,
+        String(b.team1Score), String(b.team2Score),
+        result,
+        String(b.scorers.length),
+        ...scorerCells,
         formatDate(b.createdAt),
       ]);
     }
   }
 
-  const csv = rows
-    .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(','))
-    .join('\n');
-
+  const csv = rows.map((row) => row.map(cell).join(',')).join('\n');
   const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `pari-megarama-${match.slug}-${new Date().toISOString().split('T')[0]}.csv`;
+  a.download = `jeu-megarama-${match.slug}-${new Date().toISOString().split('T')[0]}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }

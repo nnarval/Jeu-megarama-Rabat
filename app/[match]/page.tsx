@@ -25,13 +25,13 @@ function CheckIcon({ className = 'w-4 h-4' }: { className?: string }) {
   );
 }
 
-function PlayerSilhouette({ selected }: { selected: boolean }) {
+function PlayerSilhouette({ goalCount }: { goalCount: number }) {
   return (
     <svg
       viewBox="0 0 32 44"
       fill="currentColor"
       className={`w-6 h-9 transition-all duration-200 drop-shadow-sm ${
-        selected ? 'text-[#FFD700]' : 'text-white/70'
+        goalCount > 0 ? 'text-[#FFD700]' : 'text-white/70'
       }`}
     >
       <circle cx="16" cy="8" r="6.5" />
@@ -42,36 +42,36 @@ function PlayerSilhouette({ selected }: { selected: boolean }) {
 
 function FormationPlayer({
   player,
-  selected,
-  onToggle,
+  goalCount,
+  onTap,
 }: {
   player: Player;
-  selected: boolean;
-  onToggle: (name: string) => void;
+  goalCount: number;
+  onTap: (name: string) => void;
 }) {
   return (
     <button
       type="button"
-      onClick={() => onToggle(player.name)}
+      onClick={() => onTap(player.name)}
       className="flex flex-col items-center gap-0.5 group relative"
       style={{ minWidth: '44px', maxWidth: '52px' }}
     >
       <div
         className={`relative p-0.5 rounded-full transition-all duration-200 ${
-          selected ? 'bg-[#FFD700]/25' : 'hover:bg-white/10'
+          goalCount > 0 ? 'bg-[#FFD700]/25' : 'hover:bg-white/10'
         }`}
-        style={selected ? { boxShadow: '0 0 10px rgba(255,215,0,0.45)' } : {}}
+        style={goalCount > 0 ? { boxShadow: '0 0 10px rgba(255,215,0,0.45)' } : {}}
       >
-        <PlayerSilhouette selected={selected} />
-        {selected && (
-          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-[#FFD700] rounded-full flex items-center justify-center shadow">
-            <CheckIcon className="w-2 h-2 text-black" />
+        <PlayerSilhouette goalCount={goalCount} />
+        {goalCount > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-[#FFD700] rounded-full flex items-center justify-center shadow text-black font-black" style={{ fontSize: '8px' }}>
+            {goalCount}
           </span>
         )}
       </div>
       <span
         className={`text-center leading-tight font-semibold transition-colors duration-200 ${
-          selected ? 'text-[#FFD700]' : 'text-white/80'
+          goalCount > 0 ? 'text-[#FFD700]' : 'text-white/80'
         }`}
         style={{ fontSize: '8px', maxWidth: '48px' }}
       >
@@ -84,11 +84,11 @@ function FormationPlayer({
 function PitchFormation({
   players,
   selectedScorers,
-  onToggle,
+  onTap,
 }: {
   players: Player[];
   selectedScorers: string[];
-  onToggle: (name: string) => void;
+  onTap: (name: string) => void;
 }) {
   const starters = players.filter((p) => p.starter);
   const bench = players.filter((p) => !p.starter);
@@ -99,6 +99,8 @@ function PitchFormation({
   const fwd = starters.filter((p) => p.position === 'FWD');
 
   const rows = [fwd, mid, def, gk];
+
+  const countGoals = (name: string) => selectedScorers.filter((s) => s === name).length;
 
   return (
     <div className="space-y-3">
@@ -133,8 +135,8 @@ function PitchFormation({
                 <FormationPlayer
                   key={player.name}
                   player={player}
-                  selected={selectedScorers.includes(player.name)}
-                  onToggle={onToggle}
+                  goalCount={countGoals(player.name)}
+                  onTap={onTap}
                 />
               ))}
             </div>
@@ -152,8 +154,8 @@ function PitchFormation({
             <div key={player.name} className="flex-shrink-0">
               <FormationPlayer
                 player={player}
-                selected={selectedScorers.includes(player.name)}
-                onToggle={onToggle}
+                goalCount={countGoals(player.name)}
+                onTap={onTap}
               />
             </div>
           ))}
@@ -281,9 +283,13 @@ export default function MatchBettingPage() {
   }, [match]);
 
   const toggleScorer = useCallback((name: string) => {
-    setSelectedScorers((prev) =>
-      prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]
-    );
+    setSelectedScorers((prev) => {
+      const count = prev.filter((s) => s === name).length;
+      const without = prev.filter((s) => s !== name);
+      // cycle: 0 → 1 → 2 → 3 → 0
+      const next = count >= 3 ? 0 : count + 1;
+      return [...without, ...Array(next).fill(name)];
+    });
   }, []);
 
   const handleStep1Next = async () => {
@@ -367,6 +373,7 @@ export default function MatchBettingPage() {
 
   const team1Selected = selectedScorers.filter((s) => team1Squad.some((p) => p.name === s)).length;
   const team2Selected = selectedScorers.filter((s) => team2Squad.some((p) => p.name === s)).length;
+  const totalGoals = selectedScorers.length;
 
   if (bettingOpen === null) {
     return (
@@ -461,17 +468,20 @@ export default function MatchBettingPage() {
               {submittedBet.scorers.length > 0 && (
                 <div className="bg-black rounded-xl p-4">
                   <p className="text-[10px] text-gray-600 uppercase tracking-widest font-bold mb-3">
-                    Buteurs ({submittedBet.scorers.length})
+                    Buteurs ({submittedBet.scorers.length} but{submittedBet.scorers.length > 1 ? 's' : ''})
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {submittedBet.scorers.map((scorer) => (
-                      <span
-                        key={scorer}
-                        className="text-xs bg-[#1a1a1a] border border-[#2a2a2a] text-gray-300 rounded-lg px-2.5 py-1.5 font-medium"
-                      >
-                        {scorer}
-                      </span>
-                    ))}
+                    {Array.from(new Set(submittedBet.scorers)).map((scorer) => {
+                      const count = submittedBet.scorers.filter((s) => s === scorer).length;
+                      return (
+                        <span
+                          key={scorer}
+                          className="text-xs bg-[#1a1a1a] border border-[#2a2a2a] text-gray-300 rounded-lg px-2.5 py-1.5 font-medium"
+                        >
+                          {scorer}{count > 1 ? ` ×${count}` : ''}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -622,9 +632,9 @@ export default function MatchBettingPage() {
                 <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-4">
                   <h2 className="text-lg font-black text-white mb-1">Buteurs du match</h2>
                   <p className="text-gray-500 text-sm mb-4">
-                    Sélectionne les joueurs qui vont marquer.{' '}
+                    Appuie sur un joueur pour ajouter un but (jusqu&apos;à 3). Appuie encore pour remettre à 0.{' '}
                     <span style={{ color: '#FFD700' }} className="font-bold">
-                      {selectedScorers.length} choisi{selectedScorers.length > 1 ? 's' : ''}
+                      {totalGoals} but{totalGoals > 1 ? 's' : ''} pariés
                     </span>
                   </p>
 
@@ -686,14 +696,14 @@ export default function MatchBettingPage() {
                     <PitchFormation
                       players={team1Squad}
                       selectedScorers={selectedScorers}
-                      onToggle={toggleScorer}
+                      onTap={toggleScorer}
                     />
                   )}
                   {activeTeam === 'team2' && (
                     <PitchFormation
                       players={team2Squad}
                       selectedScorers={selectedScorers}
-                      onToggle={toggleScorer}
+                      onTap={toggleScorer}
                     />
                   )}
                 </div>

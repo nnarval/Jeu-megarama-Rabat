@@ -221,27 +221,27 @@ function ScoreInput({
   onChange: (v: number) => void;
 }) {
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="text-4xl">{flag}</div>
-      <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</div>
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col items-center gap-2">
+      <div className="text-3xl">{flag}</div>
+      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center max-w-[80px] truncate">{label}</div>
+      <div className="flex items-center gap-1.5">
         <button
           type="button"
           onClick={() => onChange(Math.max(0, value - 1))}
-          className="w-10 h-10 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-white text-xl font-bold hover:border-[#FFD700]/50 hover:bg-[#222] transition-all active:scale-95"
+          className="w-9 h-9 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-white text-lg font-bold hover:border-[#FFD700]/50 hover:bg-[#222] transition-all active:scale-95 flex items-center justify-center"
         >
           −
         </button>
         <div
-          className="w-16 h-16 bg-black border-2 rounded-2xl flex items-center justify-center"
+          className="w-12 h-12 bg-black border-2 rounded-xl flex items-center justify-center"
           style={{ borderColor: 'rgba(255,215,0,0.4)' }}
         >
-          <span className="text-4xl font-black text-white">{value}</span>
+          <span className="text-3xl font-black text-white">{value}</span>
         </div>
         <button
           type="button"
           onClick={() => onChange(Math.min(20, value + 1))}
-          className="w-10 h-10 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-white text-xl font-bold hover:border-[#FFD700]/50 hover:bg-[#222] transition-all active:scale-95"
+          className="w-9 h-9 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-white text-lg font-bold hover:border-[#FFD700]/50 hover:bg-[#222] transition-all active:scale-95 flex items-center justify-center"
         >
           +
         </button>
@@ -582,16 +582,16 @@ export default function MatchBettingPage() {
                   <h2 className="text-lg font-black text-white mb-1">Pronostic du score</h2>
                   <p className="text-gray-500 text-sm mb-6">Quel sera le score final ?</p>
 
-                  <div className="flex items-center justify-around py-2">
+                  <div className="flex items-center justify-center gap-3 py-2">
                     <ScoreInput
                       label={match.team1.name}
                       flag={match.team1.flag}
                       value={team1Score}
                       onChange={setTeam1Score}
                     />
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-3xl text-gray-600 font-thin">:</span>
-                      <span className="text-[10px] text-gray-500 font-bold text-center mt-1" style={{ maxWidth: '64px' }}>
+                    <div className="flex flex-col items-center gap-1 pb-4">
+                      <span className="text-2xl text-gray-600 font-thin">:</span>
+                      <span className="text-[9px] text-gray-500 font-bold text-center" style={{ maxWidth: '48px' }}>
                         {team1Score > team2Score
                           ? `${match.team1.flag} Gagne`
                           : team2Score > team1Score

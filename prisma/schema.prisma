@@ -11,6 +11,8 @@ model Bet {
   id          String   @id @default(cuid())
   matchId     String   @default("legacy")
   instagram   String
+  firstName   String   @default("")
+  lastName    String   @default("")
   team1Score  Int      @default(0)
   team2Score  Int      @default(0)
   scorers     String[]

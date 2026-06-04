@@ -10,6 +10,8 @@ type TeamTab = 'team1' | 'team2';
 
 interface BetSummary {
   instagram: string;
+  firstName: string;
+  lastName: string;
   team1Score: number;
   team2Score: number;
   scorers: string[];
@@ -254,6 +256,10 @@ export default function MatchBettingPage() {
 
   const [step, setStep] = useState<Step>(1);
   const [instagram, setInstagram] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [firstNameError, setFirstNameError] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
   const [team1Score, setTeam1Score] = useState(0);
   const [team2Score, setTeam2Score] = useState(0);
   const [selectedScorers, setSelectedScorers] = useState<string[]>([]);
@@ -281,10 +287,16 @@ export default function MatchBettingPage() {
   }, []);
 
   const handleStep1Next = async () => {
+    let hasError = false;
+    if (!firstName.trim()) { setFirstNameError('Prénom requis'); hasError = true; }
+    else setFirstNameError('');
+    if (!lastName.trim()) { setLastNameError('Nom requis'); hasError = true; }
+    else setLastNameError('');
     const clean = instagram.replace(/^@/, '').toLowerCase().trim();
-    if (!clean) { setInstagramError('Pseudo Instagram requis'); return; }
-    if (!/^[a-z0-9._]+$/.test(clean)) { setInstagramError('Pseudo invalide (lettres, chiffres, . et _ uniquement)'); return; }
-    setInstagramError('');
+    if (!clean) { setInstagramError('Pseudo Instagram requis'); hasError = true; }
+    else if (!/^[a-z0-9._]+$/.test(clean)) { setInstagramError('Pseudo invalide (lettres, chiffres, . et _ uniquement)'); hasError = true; }
+    else setInstagramError('');
+    if (hasError) return;
     setCheckingInstagram(true);
     try {
       const res = await fetch(`/api/status?matchId=${match!.slug}`);
@@ -306,6 +318,8 @@ export default function MatchBettingPage() {
         body: JSON.stringify({
           matchId: match!.slug,
           instagram,
+          firstName,
+          lastName,
           team1Score,
           team2Score,
           scorers: selectedScorers,
@@ -313,7 +327,7 @@ export default function MatchBettingPage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Erreur lors de la soumission'); setLoading(false); return; }
-      setSubmittedBet({ instagram, team1Score, team2Score, scorers: selectedScorers });
+      setSubmittedBet({ instagram, firstName, lastName, team1Score, team2Score, scorers: selectedScorers });
       setSubmitted(true);
     } catch {
       setError('Erreur réseau. Vérifiez votre connexion.');
@@ -415,7 +429,8 @@ export default function MatchBettingPage() {
                   <CheckIcon className="w-8 h-8 text-[#FFD700]" />
                 </div>
                 <h2 className="text-xl font-black text-white">Sélection enregistrée !</h2>
-                <p className="text-gray-400 text-sm mt-1">Bonne chance @{submittedBet.instagram} 🎉</p>
+                <p className="text-white font-bold mt-1">{submittedBet.firstName} {submittedBet.lastName.toUpperCase()}</p>
+                <p className="text-gray-500 text-sm">@{submittedBet.instagram} · Bonne chance 🎉</p>
               </div>
 
               <div className="bg-black rounded-xl p-4 mb-3">
@@ -477,10 +492,39 @@ export default function MatchBettingPage() {
             {step === 1 && (
               <div className="animate-slide-up">
                 <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-6">
-                  <h2 className="text-lg font-black text-white mb-1">Ton pseudo Instagram</h2>
-                  <p className="text-gray-500 text-sm mb-5">Un seul pari par compte.</p>
+                  <h2 className="text-lg font-black text-white mb-1">Tes informations</h2>
+                  <p className="text-gray-500 text-sm mb-5">Un seul pari par compte Instagram.</p>
 
-                  <div className="relative">
+                  <div className="flex gap-3 mb-3">
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => { setFirstName(e.target.value); if (firstNameError) setFirstNameError(''); }}
+                        placeholder="Prénom"
+                        autoComplete="given-name"
+                        className={`w-full bg-black border-2 rounded-xl px-4 py-3.5 text-white font-semibold placeholder-gray-700 focus:outline-none transition-colors ${
+                          firstNameError ? 'border-red-500/50' : 'border-[#2a2a2a] focus:border-[#FFD700]/50'
+                        }`}
+                      />
+                      {firstNameError && <p className="text-red-400 text-xs mt-1">⚠ {firstNameError}</p>}
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => { setLastName(e.target.value); if (lastNameError) setLastNameError(''); }}
+                        placeholder="Nom"
+                        autoComplete="family-name"
+                        className={`w-full bg-black border-2 rounded-xl px-4 py-3.5 text-white font-semibold placeholder-gray-700 focus:outline-none transition-colors ${
+                          lastNameError ? 'border-red-500/50' : 'border-[#2a2a2a] focus:border-[#FFD700]/50'
+                        }`}
+                      />
+                      {lastNameError && <p className="text-red-400 text-xs mt-1">⚠ {lastNameError}</p>}
+                    </div>
+                  </div>
+
+                  <div className="relative mb-3">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-lg select-none" style={{ color: '#FFD700' }}>@</div>
                     <input
                       type="text"
@@ -490,22 +534,22 @@ export default function MatchBettingPage() {
                         if (instagramError) setInstagramError('');
                       }}
                       onKeyDown={(e) => e.key === 'Enter' && handleStep1Next()}
-                      placeholder="ton_pseudo"
+                      placeholder="pseudo_instagram"
                       autoComplete="off"
                       autoCapitalize="none"
-                      className={`w-full bg-black border-2 rounded-xl px-4 py-4 pl-9 text-white text-lg font-semibold placeholder-gray-700 focus:outline-none transition-colors ${
+                      className={`w-full bg-black border-2 rounded-xl px-4 py-3.5 pl-9 text-white font-semibold placeholder-gray-700 focus:outline-none transition-colors ${
                         instagramError ? 'border-red-500/50' : 'border-[#2a2a2a] focus:border-[#FFD700]/50'
                       }`}
                     />
                   </div>
                   {instagramError && (
-                    <p className="text-red-400 text-sm mt-2">⚠ {instagramError}</p>
+                    <p className="text-red-400 text-sm mt-1 mb-2">⚠ {instagramError}</p>
                   )}
 
                   <button
                     onClick={handleStep1Next}
-                    disabled={checkingInstagram || !instagram.trim()}
-                    className="w-full mt-5 font-black py-4 rounded-xl transition-all duration-200 text-base active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+                    disabled={checkingInstagram || !instagram.trim() || !firstName.trim() || !lastName.trim()}
+                    className="w-full mt-3 font-black py-4 rounded-xl transition-all duration-200 text-base active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ background: '#FFD700', color: '#000' }}
                   >
                     {checkingInstagram ? (

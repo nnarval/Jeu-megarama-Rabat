@@ -13,6 +13,8 @@ interface Bet {
   id: string;
   matchId: string;
   instagram: string;
+  firstName: string;
+  lastName: string;
   team1Score: number;
   team2Score: number;
   scorers: string[];
@@ -49,11 +51,13 @@ function exportToCSV(match: MatchInfo, bets: Bet[], rankings?: RankedBet[]) {
   const matchLabel = `${match.team1.name} vs ${match.team2.name}`;
 
   if (rankings && rankings.length > 0) {
-    rows.push(['Match', 'Rang', 'Instagram', `Score ${match.team1.name}`, `Score ${match.team2.name}`, 'Résultat correct', 'Score exact', 'Buteurs corrects', 'Buteurs pariés', 'Date']);
+    rows.push(['Match', 'Rang', 'Prénom', 'Nom', 'Instagram', `Score ${match.team1.name}`, `Score ${match.team2.name}`, 'Résultat correct', 'Score exact', 'Buteurs corrects', 'Buteurs pariés', 'Date']);
     for (const r of rankings) {
       rows.push([
         matchLabel,
         String(r.rank),
+        r.firstName || '',
+        r.lastName || '',
         `@${r.instagram}`,
         String(r.team1Score),
         String(r.team2Score),
@@ -65,10 +69,12 @@ function exportToCSV(match: MatchInfo, bets: Bet[], rankings?: RankedBet[]) {
       ]);
     }
   } else {
-    rows.push(['Match', 'Instagram', `Score ${match.team1.name}`, `Score ${match.team2.name}`, 'Buteurs', 'Date']);
+    rows.push(['Match', 'Prénom', 'Nom', 'Instagram', `Score ${match.team1.name}`, `Score ${match.team2.name}`, 'Buteurs', 'Date']);
     for (const b of bets) {
       rows.push([
         matchLabel,
+        b.firstName || '',
+        b.lastName || '',
         `@${b.instagram}`,
         String(b.team1Score),
         String(b.team2Score),
@@ -550,7 +556,8 @@ export default function AdminPage() {
                   <thead>
                     <tr className="text-xs text-gray-500 uppercase tracking-wider border-b border-[#1f1f1f]">
                       <th className="text-left py-3 px-4 font-semibold">#</th>
-                      <th className="text-left py-3 px-4 font-semibold">Instagram</th>
+                      <th className="text-left py-3 px-4 font-semibold">Nom</th>
+                      <th className="text-left py-3 px-4 font-semibold hidden sm:table-cell">Instagram</th>
                       <th className="text-left py-3 px-4 font-semibold">Score</th>
                       <th className="text-left py-3 px-4 font-semibold hidden sm:table-cell">Résultat</th>
                       <th className="text-left py-3 px-4 font-semibold hidden md:table-cell">Buteurs</th>
@@ -564,7 +571,11 @@ export default function AdminPage() {
                         <tr key={bet.id} className="hover:bg-[#111] transition-colors">
                           <td className="py-3 px-4 text-gray-600 text-xs">{i + 1}</td>
                           <td className="py-3 px-4">
-                            <span className="font-semibold text-white">@{bet.instagram}</span>
+                            <span className="font-bold text-white">{bet.firstName} {bet.lastName}</span>
+                            <span className="block text-gray-500 text-xs sm:hidden">@{bet.instagram}</span>
+                          </td>
+                          <td className="py-3 px-4 hidden sm:table-cell">
+                            <span className="text-gray-400 text-sm">@{bet.instagram}</span>
                           </td>
                           <td className="py-3 px-4">
                             <span className="font-bold text-white font-mono">

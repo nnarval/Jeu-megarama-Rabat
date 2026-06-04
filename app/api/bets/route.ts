@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { matchId, instagram, team1Score, team2Score, scorers } = body;
+    const { matchId, instagram, firstName, lastName, team1Score, team2Score, scorers } = body;
 
     // Validate matchId
     if (!matchId || typeof matchId !== 'string') {
@@ -41,6 +41,14 @@ export async function POST(request: NextRequest) {
 
     if (!getMatch(matchId)) {
       return NextResponse.json({ error: 'Match inconnu' }, { status: 400 });
+    }
+
+    // Validate name fields
+    if (!firstName || typeof firstName !== 'string' || !firstName.trim()) {
+      return NextResponse.json({ error: 'Prénom requis' }, { status: 400 });
+    }
+    if (!lastName || typeof lastName !== 'string' || !lastName.trim()) {
+      return NextResponse.json({ error: 'Nom requis' }, { status: 400 });
     }
 
     // Validate instagram
@@ -106,6 +114,8 @@ export async function POST(request: NextRequest) {
       data: {
         matchId,
         instagram: cleanInstagram,
+        firstName: firstName.trim(),
+        lastName: lastName.trim().toUpperCase(),
         team1Score: Math.floor(team1Score),
         team2Score: Math.floor(team2Score),
         scorers: scorers.filter((s: unknown) => typeof s === 'string'),

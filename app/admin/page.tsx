@@ -5,7 +5,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { MATCHES, MatchInfo } from '@/lib/matches';
 import { getSquad } from '@/lib/squads';
 
-const BASE_URL = 'https://paris-megarama.vercel.app';
+const BASE_URL = typeof window !== 'undefined' ? window.location.origin : '';
 
 const ADMIN_PASSWORD = 'megarama2026';
 

@@ -733,7 +733,7 @@ export default function MatchBettingPage() {
                         Envoi...
                       </span>
                     ) : (
-                      '⚽ Valider mon pari'
+                      'Valider ma sélection'
                     )}
                   </button>
                 </div>

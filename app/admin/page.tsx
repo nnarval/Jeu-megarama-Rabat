@@ -803,10 +803,19 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="text-center mt-3">
+              <div className="flex items-center justify-center gap-4 mt-4">
                 <span className="text-xs text-gray-500">
                   → {getResultLabel(selectedMatch, realTeam1Score, realTeam2Score).label}
                 </span>
+                {bets.length > 0 && (() => {
+                  const matching = bets.filter(b => b.team1Score === realTeam1Score && b.team2Score === realTeam2Score).length;
+                  const pct = Math.round((matching / bets.length) * 100);
+                  return (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full" style={{ background: 'rgba(255,215,0,0.1)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.25)' }}>
+                      ⚽ {matching} pari{matching > 1 ? 's' : ''} sur ce score ({pct}%)
+                    </span>
+                  );
+                })()}
               </div>
             </div>
 

@@ -51,15 +51,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Nom requis' }, { status: 400 });
     }
 
-    // Validate instagram
+    // Validate email
     if (!instagram || typeof instagram !== 'string') {
-      return NextResponse.json({ error: 'Instagram invalide' }, { status: 400 });
+      return NextResponse.json({ error: 'Email invalide' }, { status: 400 });
     }
 
-    const cleanInstagram = instagram.replace(/^@/, '').toLowerCase().trim();
+    const cleanInstagram = instagram.toLowerCase().trim();
 
-    if (!cleanInstagram || cleanInstagram.length < 1) {
-      return NextResponse.json({ error: 'Instagram invalide' }, { status: 400 });
+    if (!cleanInstagram || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanInstagram)) {
+      return NextResponse.json({ error: 'Email invalide' }, { status: 400 });
     }
 
     // Validate scores
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: 'Un pari existe déjà pour ce compte Instagram' },
+        { error: 'Un pari existe déjà pour cet email' },
         { status: 409 }
       );
     }
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
       error.code === 'P2002'
     ) {
       return NextResponse.json(
-        { error: 'Un pari existe déjà pour ce compte Instagram' },
+        { error: 'Un pari existe déjà pour cet email' },
         { status: 409 }
       );
     }

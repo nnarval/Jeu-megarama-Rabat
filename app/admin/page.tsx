@@ -63,7 +63,7 @@ function exportToCSV(match: MatchInfo, bets: Bet[], rankings?: RankedBet[]) {
   if (rankings && rankings.length > 0) {
     const header = [
       'Match', 'Groupe', 'Date', 'Ville',
-      'Rang', 'Prénom', 'Nom', 'Instagram',
+      'Rang', 'Prénom', 'Nom', 'Email',
       `Score ${match.team1.name}`, `Score ${match.team2.name}`,
       'Résultat correct', 'Score exact',
       'Nb buteurs corrects', 'Nb buteurs pariés', 'Buteurs choisis',
@@ -73,7 +73,7 @@ function exportToCSV(match: MatchInfo, bets: Bet[], rankings?: RankedBet[]) {
     for (const r of rankings) {
       rows.push([
         matchLabel, match.group, match.date, match.city,
-        String(r.rank), r.firstName || '', r.lastName || '', `@${r.instagram}`,
+        String(r.rank), r.firstName || '', r.lastName || '', r.instagram,
         String(r.team1Score), String(r.team2Score),
         r.resultCorrect ? 'Oui' : 'Non',
         r.scoreExact ? 'Oui' : 'Non',
@@ -84,7 +84,7 @@ function exportToCSV(match: MatchInfo, bets: Bet[], rankings?: RankedBet[]) {
   } else {
     const header = [
       'Match', 'Groupe', 'Date', 'Ville',
-      'Prénom', 'Nom', 'Instagram',
+      'Prénom', 'Nom', 'Email',
       `Score ${match.team1.name}`, `Score ${match.team2.name}`,
       'Résultat prédit', 'Nb buteurs pariés', 'Buteurs choisis',
       'Soumis le',
@@ -98,7 +98,7 @@ function exportToCSV(match: MatchInfo, bets: Bet[], rankings?: RankedBet[]) {
         : 'Match nul';
       rows.push([
         matchLabel, match.group, match.date, match.city,
-        b.firstName || '', b.lastName || '', `@${b.instagram}`,
+        b.firstName || '', b.lastName || '', b.instagram,
         String(b.team1Score), String(b.team2Score),
         result, String(b.scorers.length), formatScorers(b.scorers),
         formatDate(b.createdAt),
@@ -570,7 +570,7 @@ export default function AdminPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Rechercher par Instagram..."
+                placeholder="Rechercher par email..."
                 className="w-full max-w-xs bg-[#111] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-[#FFD700]/60 transition-colors"
               />
             </div>
@@ -674,7 +674,7 @@ export default function AdminPage() {
                           {r.rank === 1 ? '🥇' : r.rank === 2 ? '🥈' : r.rank === 3 ? '🥉' : `#${r.rank}`}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-white">@{r.instagram}</p>
+                          <p className="font-bold text-white">{r.instagram}</p>
                           <div className="flex flex-wrap gap-2 mt-1">
                             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${r.resultCorrect ? 'bg-green-500/15 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                               {r.resultCorrect ? '✓ Résultat' : '✗ Résultat'}
@@ -720,7 +720,7 @@ export default function AdminPage() {
                               #{r.rank}
                             </span>
                           </td>
-                          <td className="py-3 px-3 font-semibold text-white">@{r.instagram}</td>
+                          <td className="py-3 px-3 font-semibold text-white">{r.instagram}</td>
                           <td className="py-3 px-3 font-mono font-bold text-white">{r.team1Score}–{r.team2Score}</td>
                           <td className={`py-3 px-3 text-xs font-semibold hidden sm:table-cell ${r.resultCorrect ? 'text-green-400' : 'text-red-400'}`}>
                             {r.resultCorrect ? '✓' : '✗'}

@@ -298,9 +298,9 @@ export default function MatchBettingPage() {
     else setFirstNameError('');
     if (!lastName.trim()) { setLastNameError('Nom requis'); hasError = true; }
     else setLastNameError('');
-    const clean = instagram.replace(/^@/, '').toLowerCase().trim();
-    if (!clean) { setInstagramError('Pseudo Instagram requis'); hasError = true; }
-    else if (!/^[a-z0-9._]+$/.test(clean)) { setInstagramError('Pseudo invalide (lettres, chiffres, . et _ uniquement)'); hasError = true; }
+    const clean = instagram.toLowerCase().trim();
+    if (!clean) { setInstagramError('Email requis'); hasError = true; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) { setInstagramError('Adresse email invalide'); hasError = true; }
     else setInstagramError('');
     if (hasError) return;
     setCheckingInstagram(true);
@@ -437,7 +437,7 @@ export default function MatchBettingPage() {
                 </div>
                 <h2 className="text-xl font-black text-white">Sélection enregistrée !</h2>
                 <p className="text-white font-bold mt-1">{submittedBet.firstName} {submittedBet.lastName.toUpperCase()}</p>
-                <p className="text-gray-500 text-sm">@{submittedBet.instagram} · Bonne chance 🎉</p>
+                <p className="text-gray-500 text-sm">{submittedBet.instagram} · Bonne chance 🎉</p>
               </div>
 
               <div className="bg-black rounded-xl p-4 mb-3">
@@ -503,7 +503,7 @@ export default function MatchBettingPage() {
               <div className="animate-slide-up">
                 <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-6">
                   <h2 className="text-lg font-black text-white mb-1">Tes informations</h2>
-                  <p className="text-gray-500 text-sm mb-5">Un seul pari par compte Instagram.</p>
+                  <p className="text-gray-500 text-sm mb-5">Un seul pari par adresse email.</p>
 
                   <div className="flex gap-3 mb-3">
                     <div className="flex-1">
@@ -535,19 +535,18 @@ export default function MatchBettingPage() {
                   </div>
 
                   <div className="relative mb-3">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-lg select-none" style={{ color: '#FFD700' }}>@</div>
                     <input
-                      type="text"
+                      type="email"
                       value={instagram}
                       onChange={(e) => {
-                        setInstagram(e.target.value.replace(/^@+/, ''));
+                        setInstagram(e.target.value);
                         if (instagramError) setInstagramError('');
                       }}
                       onKeyDown={(e) => e.key === 'Enter' && handleStep1Next()}
-                      placeholder="pseudo_instagram"
-                      autoComplete="off"
+                      placeholder="prenom@exemple.com"
+                      autoComplete="email"
                       autoCapitalize="none"
-                      className={`w-full bg-black border-2 rounded-xl px-4 py-3.5 pl-9 text-white font-semibold placeholder-gray-700 focus:outline-none transition-colors ${
+                      className={`w-full bg-black border-2 rounded-xl px-4 py-3.5 text-white font-semibold placeholder-gray-700 focus:outline-none transition-colors ${
                         instagramError ? 'border-red-500/50' : 'border-[#2a2a2a] focus:border-[#FFD700]/50'
                       }`}
                     />

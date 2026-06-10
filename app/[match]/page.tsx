@@ -503,6 +503,7 @@ export default function MatchBettingPage() {
               <div className="animate-slide-up">
                 <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-6">
                   <h2 className="text-lg font-black text-white mb-1">Tes informations</h2>
+                  <p className="text-[#FFD700]/80 text-xs font-semibold mb-2">Pronostique le résultat du match et les buteurs, et tente de remporter un lot offert par Megarama !</p>
                   <p className="text-gray-500 text-sm mb-5">Un seul pari par adresse email.</p>
 
                   <div className="flex gap-3 mb-3">
@@ -579,6 +580,7 @@ export default function MatchBettingPage() {
               <div className="animate-slide-up">
                 <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-6">
                   <h2 className="text-lg font-black text-white mb-1">Pronostic du score</h2>
+                  <p className="text-[#FFD700]/80 text-xs font-semibold mb-1">Pronostique le résultat du match et les buteurs, et tente de remporter un lot offert par Megarama !</p>
                   <p className="text-gray-500 text-sm mb-6">Quel sera le score final ?</p>
 
                   <div className="flex items-center justify-center gap-3 py-2">
@@ -630,6 +632,7 @@ export default function MatchBettingPage() {
               <div className="animate-slide-up space-y-4">
                 <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-4">
                   <h2 className="text-lg font-black text-white mb-1">Buteurs du match</h2>
+                  <p className="text-[#FFD700]/80 text-xs font-semibold mb-1">Pronostique le résultat du match et les buteurs, et tente de remporter un lot offert par Megarama !</p>
                   <p className="text-gray-500 text-sm mb-4">
                     Appuie sur un joueur pour ajouter un but (jusqu&apos;à 3). Appuie encore pour remettre à 0.{' '}
                     <span style={{ color: '#FFD700' }} className="font-bold">

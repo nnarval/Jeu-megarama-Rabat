@@ -487,9 +487,9 @@ export default function AdminPage() {
             </p>
           </div>
           <div className="bg-[#111] border border-[#1f1f1f] rounded-xl p-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Top 5</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Top 8</p>
             <p className="text-sm font-bold text-white">
-              {hasResult ? `${rankings.filter(r => r.rank <= 5).length} joueurs` : '—'}
+              {hasResult ? `${rankings.filter(r => r.rank <= 8).length} joueurs` : '—'}
             </p>
           </div>
         </div>
@@ -660,10 +660,10 @@ export default function AdminPage() {
               <div>
                 <div className="mb-6">
                   <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">
-                    🥇 Top 5 — Gagnants
+                    🥇 Top 8 — Gagnants
                   </h3>
                   <div className="space-y-2">
-                    {rankings.filter(r => r.rank <= 5).map((r) => (
+                    {rankings.filter(r => r.rank <= 8).map((r) => (
                       <div
                         key={r.id}
                         className={`bg-[#111] border rounded-xl px-4 py-3 flex items-center gap-4 ${
@@ -714,7 +714,7 @@ export default function AdminPage() {
                     </thead>
                     <tbody className="divide-y divide-[#0f0f0f]">
                       {rankings.map((r) => (
-                        <tr key={r.id} className={`hover:bg-[#0f0f0f] transition-colors ${r.rank <= 5 ? 'bg-[#FFD700]/5' : ''}`}>
+                        <tr key={r.id} className={`hover:bg-[#0f0f0f] transition-colors ${r.rank <= 8 ? 'bg-[#FFD700]/5' : ''}`}>
                           <td className="py-3 px-3">
                             <span className={`font-bold ${r.rank === 1 ? 'text-yellow-400' : r.rank === 2 ? 'text-gray-300' : r.rank === 3 ? 'text-amber-600' : 'text-gray-600'}`}>
                               #{r.rank}

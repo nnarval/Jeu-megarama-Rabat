@@ -1,7 +1,7 @@
 export interface Player {
   name: string;
   shortName: string;
-  position: 'GK' | 'DEF' | 'MID' | 'FWD';
+  position: 'GK' | 'DEF' | 'DMID' | 'MID' | 'FWD';
   starter: boolean;
 }
 
@@ -14,8 +14,8 @@ const BRESIL: Squad = [
   { name: 'Marquinhos', shortName: 'Marquinhos', position: 'DEF', starter: true },
   { name: 'Gabriel Magalhães', shortName: 'G. Magalhães', position: 'DEF', starter: true },
   { name: 'Douglas Santos', shortName: 'D. Santos', position: 'DEF', starter: true },
-  { name: 'Casemiro', shortName: 'Casemiro', position: 'MID', starter: true },
-  { name: 'Bruno Guimarães', shortName: 'Guimarães', position: 'MID', starter: true },
+  { name: 'Casemiro', shortName: 'Casemiro', position: 'DMID', starter: true },
+  { name: 'Bruno Guimarães', shortName: 'Guimarães', position: 'DMID', starter: true },
   { name: 'Raphinha', shortName: 'Raphinha', position: 'MID', starter: true },
   { name: 'Lucas Paquetá', shortName: 'Paquetá', position: 'MID', starter: true },
   { name: 'Vinicius Junior', shortName: 'Vinicius Jr', position: 'MID', starter: true },
@@ -45,8 +45,8 @@ const MAROC: Squad = [
   { name: 'Issa Diop', shortName: 'I. Diop', position: 'DEF', starter: true },
   { name: 'Chadi Riad', shortName: 'Ch. Riad', position: 'DEF', starter: true },
   { name: 'Noussair Mazraoui', shortName: 'Mazraoui', position: 'DEF', starter: true },
-  { name: 'Ayyoub Bouaddi', shortName: 'Bouaddi', position: 'MID', starter: true },
-  { name: 'Neil El Aynaoui', shortName: 'El Aynaoui', position: 'MID', starter: true },
+  { name: 'Ayyoub Bouaddi', shortName: 'Bouaddi', position: 'DMID', starter: true },
+  { name: 'Neil El Aynaoui', shortName: 'El Aynaoui', position: 'DMID', starter: true },
   { name: 'Brahim Díaz', shortName: 'B. Díaz', position: 'MID', starter: true },
   { name: 'Azzedine Ounahi', shortName: 'Ounahi', position: 'MID', starter: true },
   { name: 'Bilal El Khannouss', shortName: 'El Khannouss', position: 'MID', starter: true },

@@ -95,10 +95,13 @@ function PitchFormation({
 
   const gk = starters.filter((p) => p.position === 'GK');
   const def = starters.filter((p) => p.position === 'DEF');
+  const dmid = starters.filter((p) => p.position === 'DMID');
   const mid = starters.filter((p) => p.position === 'MID');
   const fwd = starters.filter((p) => p.position === 'FWD');
 
-  const rows = [fwd, mid, def, gk];
+  const rows = dmid.length > 0
+    ? [fwd, mid, dmid, def, gk]
+    : [fwd, mid, def, gk];
 
   const countGoals = (name: string) => selectedScorers.filter((s) => s === name).length;
 

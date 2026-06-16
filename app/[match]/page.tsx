@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { getMatch, MatchInfo } from '@/lib/matches';
 import { getSquad, Player } from '@/lib/squads';
@@ -285,15 +285,48 @@ export default function MatchBettingPage() {
       .catch(() => setBettingOpen(false));
   }, [match]);
 
+  const team1Squad = useMemo(() => match ? getSquad(match.team1.squadKey) : [], [match]);
+  const team2Squad = useMemo(() => match ? getSquad(match.team2.squadKey) : [], [match]);
+
   const toggleScorer = useCallback((name: string) => {
     setSelectedScorers((prev) => {
+      const isTeam1 = team1Squad.some((p) => p.name === name);
+      const teamSquad = isTeam1 ? team1Squad : team2Squad;
+      const teamScore = isTeam1 ? team1Score : team2Score;
+
       const count = prev.filter((s) => s === name).length;
       const without = prev.filter((s) => s !== name);
-      // cycle: 0 → 1 → 2 → 3 → 0
-      const next = count >= 3 ? 0 : count + 1;
+      const teamGoalsWithout = without.filter((s) => teamSquad.some((p) => p.name === s)).length;
+
+      const maxForPlayer = Math.min(3, Math.max(0, teamScore - teamGoalsWithout));
+      const next = count >= maxForPlayer ? 0 : count + 1;
       return [...without, ...Array(next).fill(name)];
     });
-  }, []);
+  }, [team1Score, team2Score, team1Squad, team2Squad]);
+
+  useEffect(() => {
+    setSelectedScorers((prev) => {
+      if (!prev.length) return prev;
+      const team1Names = new Set(team1Squad.map((p) => p.name));
+      const playerCounts = new Map<string, number>();
+      prev.forEach((n) => playerCounts.set(n, (playerCounts.get(n) || 0) + 1));
+      const result: string[] = [];
+      let t1 = 0, t2 = 0;
+      playerCounts.forEach((count, n) => {
+        const isTeam1 = team1Names.has(n);
+        if (isTeam1) {
+          const use = Math.min(count, Math.max(0, team1Score - t1));
+          result.push(...Array(use).fill(n));
+          t1 += use;
+        } else {
+          const use = Math.min(count, Math.max(0, team2Score - t2));
+          result.push(...Array(use).fill(n));
+          t2 += use;
+        }
+      });
+      return result;
+    });
+  }, [team1Score, team2Score, team1Squad, team2Squad]);
 
   const handleStep1Next = async () => {
     let hasError = false;
@@ -371,8 +404,7 @@ export default function MatchBettingPage() {
     );
   }
 
-  const team1Squad = getSquad(match.team1.squadKey);
-  const team2Squad = getSquad(match.team2.squadKey);
+
 
   const team1Selected = selectedScorers.filter((s) => team1Squad.some((p) => p.name === s)).length;
   const team2Selected = selectedScorers.filter((s) => team2Squad.some((p) => p.name === s)).length;
@@ -637,9 +669,9 @@ export default function MatchBettingPage() {
                   <h2 className="text-lg font-black text-white mb-1">Buteurs du match</h2>
                   <p className="text-[#FFD700]/80 text-xs font-semibold mb-1">Pronostique le résultat du match et les buteurs, et tente de remporter un lot offert par Megarama !</p>
                   <p className="text-gray-500 text-sm mb-4">
-                    Appuie sur un joueur pour ajouter un but (jusqu&apos;à 3). Appuie encore pour remettre à 0.{' '}
+                    Appuie sur un joueur pour l&apos;ajouter comme buteur.{' '}
                     <span style={{ color: '#FFD700' }} className="font-bold">
-                      {totalGoals} but{totalGoals > 1 ? 's' : ''} pariés
+                      {match.team1.flag} {team1Selected}/{team1Score} · {match.team2.flag} {team2Selected}/{team2Score}
                     </span>
                   </p>
 

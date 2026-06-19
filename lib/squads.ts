@@ -240,32 +240,32 @@ const RD_CONGO: Squad = [
 ];
 
 const ECOSSE: Squad = [
-  // Titulaires (4-3-3 probable)
-  { name: 'Craig Gordon', shortName: 'C. Gordon', position: 'GK', starter: true },
-  { name: 'Nathan Patterson', shortName: 'Patterson', position: 'DEF', starter: true },
+  // Titulaires (4-4-2)
+  { name: 'Angus Gunn', shortName: 'A. Gunn', position: 'GK', starter: true },
+  { name: 'Aaron Hickey', shortName: 'Hickey', position: 'DEF', starter: true },
   { name: 'Jack Hendry', shortName: 'Hendry', position: 'DEF', starter: true },
   { name: 'Grant Hanley', shortName: 'Hanley', position: 'DEF', starter: true },
   { name: 'Andy Robertson', shortName: 'Robertson', position: 'DEF', starter: true },
+  { name: 'Ben Gannon-Doak', shortName: 'Gannon-Doak', position: 'MID', starter: true },
+  { name: 'Lewis Ferguson', shortName: 'L. Ferguson', position: 'MID', starter: true },
   { name: 'Scott McTominay', shortName: 'McTominay', position: 'MID', starter: true },
   { name: 'John McGinn', shortName: 'McGinn', position: 'MID', starter: true },
-  { name: 'Billy Gilmour', shortName: 'Gilmour', position: 'MID', starter: true },
   { name: 'Che Adams', shortName: 'Che Adams', position: 'FWD', starter: true },
   { name: 'Lawrence Shankland', shortName: 'Shankland', position: 'FWD', starter: true },
-  { name: 'Ross Stewart', shortName: 'R. Stewart', position: 'FWD', starter: true },
   // Remplaçants
-  { name: 'Angus Gunn', shortName: 'A. Gunn', position: 'GK', starter: false },
+  { name: 'Craig Gordon', shortName: 'C. Gordon', position: 'GK', starter: false },
   { name: 'Liam Kelly', shortName: 'L. Kelly', position: 'GK', starter: false },
-  { name: 'Aaron Hickey', shortName: 'Hickey', position: 'DEF', starter: false },
+  { name: 'Nathan Patterson', shortName: 'Patterson', position: 'DEF', starter: false },
   { name: 'Dom Hyam', shortName: 'Hyam', position: 'DEF', starter: false },
   { name: 'Scott McKenna', shortName: 'McKenna', position: 'DEF', starter: false },
   { name: 'Anthony Ralston', shortName: 'Ralston', position: 'DEF', starter: false },
   { name: 'John Souttar', shortName: 'Souttar', position: 'DEF', starter: false },
   { name: 'Kieran Tierney', shortName: 'K. Tierney', position: 'DEF', starter: false },
+  { name: 'Billy Gilmour', shortName: 'Gilmour', position: 'MID', starter: false },
   { name: 'Ryan Christie', shortName: 'Christie', position: 'MID', starter: false },
   { name: 'Findlay Curtis', shortName: 'Curtis', position: 'MID', starter: false },
-  { name: 'Lewis Ferguson', shortName: 'L. Ferguson', position: 'MID', starter: false },
-  { name: 'Ben Gannon-Doak', shortName: 'Gannon-Doak', position: 'MID', starter: false },
   { name: 'Kenny McLean', shortName: 'McLean', position: 'MID', starter: false },
+  { name: 'Ross Stewart', shortName: 'R. Stewart', position: 'FWD', starter: false },
   { name: 'Lyndon Dykes', shortName: 'Dykes', position: 'FWD', starter: false },
   { name: 'George Hirst', shortName: 'G. Hirst', position: 'FWD', starter: false },
 ];

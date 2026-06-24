@@ -41,15 +41,15 @@ const BRESIL: Squad = [
 const MAROC: Squad = [
   // Titulaires (4-2-3-1)
   { name: 'Yassine Bounou', shortName: 'Bono', position: 'GK', starter: true },
-  { name: 'Achraf Hakimi', shortName: 'Hakimi', position: 'DEF', starter: true },
+  { name: 'Anass Salah-Eddine', shortName: 'Salah-Eddine', position: 'DEF', starter: true },
   { name: 'Redouane Halhal', shortName: 'Halhal', position: 'DEF', starter: true },
   { name: 'Chadi Riad', shortName: 'Ch. Riad', position: 'DEF', starter: true },
-  { name: 'Anass Salah-Eddine', shortName: 'Salah-Eddine', position: 'DEF', starter: true },
+  { name: 'Achraf Hakimi', shortName: 'Hakimi', position: 'DEF', starter: true },
   { name: 'Sofyan Amrabat', shortName: 'Amrabat', position: 'DMID', starter: true },
   { name: 'Neil El Aynaoui', shortName: 'El Aynaoui', position: 'DMID', starter: true },
-  { name: 'Brahim Díaz', shortName: 'B. Díaz', position: 'MID', starter: true },
-  { name: 'Ismael Saibari', shortName: 'Saibari', position: 'MID', starter: true },
   { name: 'Bilal El Khannouss', shortName: 'El Khannouss', position: 'MID', starter: true },
+  { name: 'Ismael Saibari', shortName: 'Saibari', position: 'MID', starter: true },
+  { name: 'Brahim Díaz', shortName: 'B. Díaz', position: 'MID', starter: true },
   { name: 'Ayoub El Kaabi', shortName: 'El Kaabi', position: 'FWD', starter: true },
   // Remplaçants
   { name: 'Munir El Kajoui', shortName: 'El Kajoui', position: 'GK', starter: false },
@@ -474,14 +474,14 @@ const GHANA: Squad = [
 const HAITI: Squad = [
   // Titulaires (4-4-2)
   { name: 'Johny Placide', shortName: 'Placide', position: 'GK', starter: true },
-  { name: 'Jean-Kévin Duverne', shortName: 'Duverne', position: 'DEF', starter: true },
-  { name: 'Ricardo Adé', shortName: 'R. Adé', position: 'DEF', starter: true },
-  { name: 'Hannes Delcroix', shortName: 'Delcroix', position: 'DEF', starter: true },
   { name: 'Martin Expérience', shortName: 'Expérience', position: 'DEF', starter: true },
-  { name: 'Josué Casimir', shortName: 'Casimir', position: 'MID', starter: true },
-  { name: 'Danley Jean Jacques', shortName: 'Jean Jacques', position: 'MID', starter: true },
-  { name: 'Jean-Ricner Bellegarde', shortName: 'Bellegarde', position: 'MID', starter: true },
+  { name: 'Hannes Delcroix', shortName: 'Delcroix', position: 'DEF', starter: true },
+  { name: 'Ricardo Adé', shortName: 'R. Adé', position: 'DEF', starter: true },
+  { name: 'Jean-Kévin Duverne', shortName: 'Duverne', position: 'DEF', starter: true },
   { name: 'Ruben Providence', shortName: 'Providence', position: 'MID', starter: true },
+  { name: 'Jean-Ricner Bellegarde', shortName: 'Bellegarde', position: 'MID', starter: true },
+  { name: 'Danley Jean Jacques', shortName: 'Jean Jacques', position: 'MID', starter: true },
+  { name: 'Josué Casimir', shortName: 'Casimir', position: 'MID', starter: true },
   { name: 'Wilson Isidor', shortName: 'Isidor', position: 'FWD', starter: true },
   { name: 'Lenny Joseph', shortName: 'L. Joseph', position: 'FWD', starter: true },
   // Remplaçants

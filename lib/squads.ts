@@ -531,6 +531,37 @@ const NORVEGE: Squad = [
   { name: 'Joshua King', shortName: 'J. King', position: 'FWD', starter: false },
 ];
 
+const PAYSBAS: Squad = [
+  // Titulaires (4-3-3 probable)
+  { name: 'Bart Verbruggen', shortName: 'Verbruggen', position: 'GK', starter: true },
+  { name: 'Denzel Dumfries', shortName: 'Dumfries', position: 'DEF', starter: true },
+  { name: 'Stefan de Vrij', shortName: 'De Vrij', position: 'DEF', starter: true },
+  { name: 'Virgil van Dijk', shortName: 'Van Dijk', position: 'DEF', starter: true },
+  { name: 'Nathan Aké', shortName: 'Aké', position: 'DEF', starter: true },
+  { name: 'Ryan Gravenberch', shortName: 'Gravenberch', position: 'MID', starter: true },
+  { name: 'Tijjani Reijnders', shortName: 'Reijnders', position: 'MID', starter: true },
+  { name: 'Teun Koopmeiners', shortName: 'Koopmeiners', position: 'MID', starter: true },
+  { name: 'Xavi Simons', shortName: 'Simons', position: 'FWD', starter: true },
+  { name: 'Cody Gakpo', shortName: 'Gakpo', position: 'FWD', starter: true },
+  { name: 'Donyell Malen', shortName: 'Malen', position: 'FWD', starter: true },
+  // Remplaçants
+  { name: 'Mark Flekken', shortName: 'Flekken', position: 'GK', starter: false },
+  { name: 'Justin Bijlow', shortName: 'Bijlow', position: 'GK', starter: false },
+  { name: 'Matthijs de Ligt', shortName: 'De Ligt', position: 'DEF', starter: false },
+  { name: 'Jurriën Timber', shortName: 'J. Timber', position: 'DEF', starter: false },
+  { name: 'Lutsharel Geertruida', shortName: 'Geertruida', position: 'DEF', starter: false },
+  { name: 'Ian Maatsen', shortName: 'Maatsen', position: 'DEF', starter: false },
+  { name: 'Mats Wieffer', shortName: 'Wieffer', position: 'MID', starter: false },
+  { name: 'Joey Veerman', shortName: 'Veerman', position: 'MID', starter: false },
+  { name: 'Jeremie Frimpong', shortName: 'Frimpong', position: 'MID', starter: false },
+  { name: 'Memphis Depay', shortName: 'Depay', position: 'FWD', starter: false },
+  { name: 'Wout Weghorst', shortName: 'Weghorst', position: 'FWD', starter: false },
+  { name: 'Brian Brobbey', shortName: 'Brobbey', position: 'FWD', starter: false },
+  { name: 'Noa Lang', shortName: 'N. Lang', position: 'FWD', starter: false },
+  { name: 'Quinten Timber', shortName: 'Q. Timber', position: 'MID', starter: false },
+  { name: 'Steven Bergwijn', shortName: 'Bergwijn', position: 'FWD', starter: false },
+];
+
 export const SQUADS: Record<string, Squad> = {
   bresil: BRESIL,
   maroc: MAROC,
@@ -550,6 +581,7 @@ export const SQUADS: Record<string, Squad> = {
   ghana: GHANA,
   haiti: HAITI,
   norvege: NORVEGE,
+  paysbas: PAYSBAS,
 };
 
 export function getSquad(squadKey: string): Squad {

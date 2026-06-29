@@ -42,6 +42,15 @@ export const MATCHES: MatchInfo[] = [
     group: 'Gr. C',
     city: 'Atlanta',
   },
+  {
+    slug: 'maroc-paysbas',
+    team1: { name: 'Maroc', flag: '🇲🇦', squadKey: 'maroc' },
+    team2: { name: 'Pays-Bas', flag: '🇳🇱', squadKey: 'paysbas' },
+    date: 'Lun 30 Juin',
+    time: '02:00',
+    group: '1/8 de finale',
+    city: 'Monterrey',
+  },
 ];
 
 export function getMatch(slug: string): MatchInfo | undefined {

@@ -562,6 +562,37 @@ const PAYSBAS: Squad = [
   { name: 'Wout Weghorst', shortName: 'Weghorst', position: 'FWD', starter: false },
 ];
 
+const CANADA: Squad = [
+  // Titulaires (4-3-3 probable)
+  { name: 'Dayne St. Clair', shortName: 'St. Clair', position: 'GK', starter: true },
+  { name: 'Alistair Johnston', shortName: 'Johnston', position: 'DEF', starter: true },
+  { name: 'Moïse Bombito', shortName: 'Bombito', position: 'DEF', starter: true },
+  { name: 'Derek Cornelius', shortName: 'Cornelius', position: 'DEF', starter: true },
+  { name: 'Alphonso Davies', shortName: 'Davies', position: 'DEF', starter: true },
+  { name: 'Stephen Eustáquio', shortName: 'Eustáquio', position: 'MID', starter: true },
+  { name: 'Ismaël Koné', shortName: 'Koné', position: 'MID', starter: true },
+  { name: 'Jonathan Osorio', shortName: 'Osorio', position: 'MID', starter: true },
+  { name: 'Tajon Buchanan', shortName: 'Buchanan', position: 'FWD', starter: true },
+  { name: 'Jonathan David', shortName: 'J. David', position: 'FWD', starter: true },
+  { name: 'Cyle Larin', shortName: 'Larin', position: 'FWD', starter: true },
+  // Remplaçants
+  { name: 'Maxime Crépeau', shortName: 'Crépeau', position: 'GK', starter: false },
+  { name: 'Tom McGill', shortName: 'McGill', position: 'GK', starter: false },
+  { name: 'Richie Laryea', shortName: 'Laryea', position: 'DEF', starter: false },
+  { name: 'Kamal Miller', shortName: 'K. Miller', position: 'DEF', starter: false },
+  { name: 'Joel Waterman', shortName: 'Waterman', position: 'DEF', starter: false },
+  { name: 'Sam Adekugbe', shortName: 'Adekugbe', position: 'DEF', starter: false },
+  { name: 'Niko Sigur', shortName: 'Sigur', position: 'DEF', starter: false },
+  { name: 'Mathieu Choinière', shortName: 'Choinière', position: 'MID', starter: false },
+  { name: 'Nathan Saliba', shortName: 'Saliba', position: 'MID', starter: false },
+  { name: 'Ali Ahmed', shortName: 'A. Ahmed', position: 'MID', starter: false },
+  { name: 'Jacob Shaffelburg', shortName: 'Shaffelburg', position: 'FWD', starter: false },
+  { name: 'Liam Millar', shortName: 'Millar', position: 'FWD', starter: false },
+  { name: 'Tani Oluwaseyi', shortName: 'Oluwaseyi', position: 'FWD', starter: false },
+  { name: 'Promise David', shortName: 'P. David', position: 'FWD', starter: false },
+  { name: 'Daniel Jebbison', shortName: 'Jebbison', position: 'FWD', starter: false },
+];
+
 export const SQUADS: Record<string, Squad> = {
   bresil: BRESIL,
   maroc: MAROC,
@@ -582,6 +613,7 @@ export const SQUADS: Record<string, Squad> = {
   haiti: HAITI,
   norvege: NORVEGE,
   paysbas: PAYSBAS,
+  canada: CANADA,
 };
 
 export function getSquad(squadKey: string): Squad {

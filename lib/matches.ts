@@ -48,8 +48,17 @@ export const MATCHES: MatchInfo[] = [
     team2: { name: 'Pays-Bas', flag: '🇳🇱', squadKey: 'paysbas' },
     date: 'Lun 30 Juin',
     time: '02:00',
-    group: '1/8 de finale',
+    group: '1/16 de finale',
     city: 'Monterrey',
+  },
+  {
+    slug: 'maroc-canada',
+    team1: { name: 'Maroc', flag: '🇲🇦', squadKey: 'maroc' },
+    team2: { name: 'Canada', flag: '🇨🇦', squadKey: 'canada' },
+    date: 'Sam 4 Juillet',
+    time: '18:00',
+    group: '1/8 de finale',
+    city: 'Houston',
   },
 ];
 

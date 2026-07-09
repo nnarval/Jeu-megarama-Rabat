@@ -128,32 +128,36 @@ const EGYPTE: Squad = [
 ];
 
 const FRANCE: Squad = [
-  // Titulaires (4-3-3)
+  // Titulaires (4-2-3-1) — ordre gauche → droite
   { name: 'Mike Maignan', shortName: 'Maignan', position: 'GK', starter: true },
-  { name: 'Benjamin Pavard', shortName: 'Pavard', position: 'DEF', starter: true },
-  { name: 'William Saliba', shortName: 'Saliba', position: 'DEF', starter: true },
+  { name: 'Lucas Digne', shortName: 'Digne', position: 'DEF', starter: true },
   { name: 'Dayot Upamecano', shortName: 'Upamecano', position: 'DEF', starter: true },
-  { name: 'Theo Hernandez', shortName: 'T. Hernandez', position: 'DEF', starter: true },
-  { name: 'Aurelien Tchouameni', shortName: 'Tchouameni', position: 'MID', starter: true },
-  { name: 'Eduardo Camavinga', shortName: 'Camavinga', position: 'MID', starter: true },
-  { name: 'Antoine Griezmann', shortName: 'Griezmann', position: 'MID', starter: true },
-  { name: 'Ousmane Dembélé', shortName: 'Dembélé', position: 'FWD', starter: true },
+  { name: 'William Saliba', shortName: 'Saliba', position: 'DEF', starter: true },
+  { name: 'Jules Koundé', shortName: 'Koundé', position: 'DEF', starter: true },
+  { name: 'Manu Koné', shortName: 'Koné', position: 'DMID', starter: true },
+  { name: 'Adrien Rabiot', shortName: 'Rabiot', position: 'DMID', starter: true },
+  { name: 'Désiré Doué', shortName: 'Doué', position: 'MID', starter: true },
+  { name: 'Michael Olise', shortName: 'Olise', position: 'MID', starter: true },
+  { name: 'Ousmane Dembélé', shortName: 'Dembélé', position: 'MID', starter: true },
   { name: 'Kylian Mbappé', shortName: 'Mbappé', position: 'FWD', starter: true },
-  { name: 'Marcus Thuram', shortName: 'M. Thuram', position: 'FWD', starter: true },
   // Remplaçants
   { name: 'Alphonse Areola', shortName: 'Areola', position: 'GK', starter: false },
   { name: 'Brice Samba', shortName: 'Samba', position: 'GK', starter: false },
-  { name: 'Jonathan Clauss', shortName: 'Clauss', position: 'DEF', starter: false },
+  { name: 'Benjamin Pavard', shortName: 'Pavard', position: 'DEF', starter: false },
   { name: 'Ibrahima Konaté', shortName: 'Konaté', position: 'DEF', starter: false },
+  { name: 'Theo Hernandez', shortName: 'T. Hernandez', position: 'DEF', starter: false },
   { name: 'Lucas Hernandez', shortName: 'L. Hernandez', position: 'DEF', starter: false },
-  { name: 'Matteo Guendouzi', shortName: 'Guendouzi', position: 'MID', starter: false },
-  { name: 'Adrien Rabiot', shortName: 'Rabiot', position: 'MID', starter: false },
+  { name: 'Jonathan Clauss', shortName: 'Clauss', position: 'DEF', starter: false },
+  { name: 'Aurelien Tchouameni', shortName: 'Tchouameni', position: 'MID', starter: false },
+  { name: 'Eduardo Camavinga', shortName: 'Camavinga', position: 'MID', starter: false },
   { name: 'Youssouf Fofana', shortName: 'Fofana', position: 'MID', starter: false },
+  { name: 'Matteo Guendouzi', shortName: 'Guendouzi', position: 'MID', starter: false },
+  { name: 'Warren Zaïre-Emery', shortName: 'Zaïre-Emery', position: 'MID', starter: false },
+  { name: 'Antoine Griezmann', shortName: 'Griezmann', position: 'MID', starter: false },
+  { name: 'Marcus Thuram', shortName: 'M. Thuram', position: 'FWD', starter: false },
   { name: 'Christopher Nkunku', shortName: 'Nkunku', position: 'FWD', starter: false },
   { name: 'Randal Kolo Muani', shortName: 'Kolo Muani', position: 'FWD', starter: false },
   { name: 'Olivier Giroud', shortName: 'Giroud', position: 'FWD', starter: false },
-  { name: 'Michael Olise', shortName: 'Olise', position: 'FWD', starter: false },
-  { name: 'Warren Zaïre-Emery', shortName: 'Zaïre-Emery', position: 'MID', starter: false },
 ];
 
 const SENEGAL: Squad = [

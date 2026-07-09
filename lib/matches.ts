@@ -60,6 +60,15 @@ export const MATCHES: MatchInfo[] = [
     group: '1/8 de finale',
     city: 'Houston',
   },
+  {
+    slug: 'france-maroc',
+    team1: { name: 'France', flag: '🇫🇷', squadKey: 'france' },
+    team2: { name: 'Maroc', flag: '🇲🇦', squadKey: 'maroc' },
+    date: 'Jeu 9 Juillet',
+    time: '21:00',
+    group: '1/4 de finale',
+    city: 'Boston',
+  },
 ];
 
 export function getMatch(slug: string): MatchInfo | undefined {
